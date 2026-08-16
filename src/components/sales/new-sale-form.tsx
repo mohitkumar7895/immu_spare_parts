@@ -1,0 +1,231 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createSale } from '@/app/actions/transaction-actions';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Search, Plus, Trash2, User as UserIcon, Package } from 'lucide-react';
+import { toast } from 'sonner';
+
+// Props passed down from server containing all customers and active parts
+export function NewSaleForm({ customers, parts }: { customers: any[], parts: any[] }) {
+  const router = useRouter();
+  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
+  const [discount, setDiscount] = useState<number>(0);
+  const [cart, setCart] = useState<any[]>([]);
+  const [searchPart, setSearchPart] = useState('');
+  const [isPending, setIsPending] = useState(false);
+
+  const filteredParts = parts.filter(p => 
+    p.status === 'ACTIVE' && 
+    (p.part_name.toLowerCase().includes(searchPart.toLowerCase()) || 
+     p.part_number.toLowerCase().includes(searchPart.toLowerCase()))
+  );
+
+  const addToCart = (part: any) => {
+    if (part.current_stock <= 0) {
+      toast.error('Part is out of stock!');
+      return;
+    }
+    
+    const existing = cart.find(item => item.part_id === part.id);
+    if (existing) {
+      if (existing.quantity >= part.current_stock) {
+        toast.error('Cannot add more than available stock!');
+        return;
+      }
+      setCart(cart.map(item => item.part_id === part.id ? { ...item, quantity: item.quantity + 1 } : item));
+    } else {
+      setCart([...cart, { part_id: part.id, part_name: part.part_name, selling_price: part.selling_price, quantity: 1, max_stock: part.current_stock }]);
+    }
+  };
+
+  const updateQuantity = (part_id: string, qty: number) => {
+    const item = cart.find(i => i.part_id === part_id);
+    if (qty > item.max_stock) {
+      toast.error('Exceeds available stock!');
+      return;
+    }
+    if (qty <= 0) {
+      removeFromCart(part_id);
+      return;
+    }
+    setCart(cart.map(i => i.part_id === part_id ? { ...i, quantity: qty } : i));
+  };
+
+  const removeFromCart = (part_id: string) => {
+    setCart(cart.filter(item => item.part_id !== part_id));
+  };
+
+  const subtotal = cart.reduce((acc, item) => acc + (item.selling_price * item.quantity), 0);
+  const grandTotal = subtotal - discount;
+
+  const handleSubmit = async () => {
+    if (!selectedCustomer) {
+      toast.error('Please select a customer');
+      return;
+    }
+    if (cart.length === 0) {
+      toast.error('Cart is empty');
+      return;
+    }
+
+    setIsPending(true);
+    try {
+      const payload = {
+        customer_id: selectedCustomer,
+        discount: discount,
+        items: cart.map(i => ({ part_id: i.part_id, quantity: i.quantity, selling_price: i.selling_price }))
+      };
+      
+      const res = await createSale(payload);
+      if (res.success) {
+        toast.success('Sale created successfully!');
+        router.push(`/dashboard/sales/${res.saleId}/invoice`);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to create sale');
+      setIsPending(false);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      {/* Left side: Search & Parts */}
+      <div className="lg:col-span-2 space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center">
+              <Package className="w-5 h-5 mr-2" />
+              Select Parts
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="relative mb-4">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search part by name or number..." 
+                className="pl-8"
+                value={searchPart}
+                onChange={e => setSearchPart(e.target.value)}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto pr-2">
+              {filteredParts.slice(0, 12).map(part => (
+                <div key={part.id} className="border rounded-lg p-3 hover:border-primary cursor-pointer transition-colors" onClick={() => addToCart(part)}>
+                  <p className="font-semibold text-sm truncate" title={part.part_name}>{part.part_name}</p>
+                  <p className="text-xs text-muted-foreground">{part.part_number}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="font-bold">₹{part.selling_price}</span>
+                    <span className={`text-xs px-2 py-1 rounded ${part.current_stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      Stock: {part.current_stock}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {filteredParts.length === 0 && (
+                <div className="col-span-full py-8 text-center text-muted-foreground">
+                  No parts found matching search.
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Right side: POS Cart & Checkout */}
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center">
+              <UserIcon className="w-5 h-5 mr-2" />
+              Customer
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <select 
+              className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+              value={selectedCustomer}
+              onChange={(e) => setSelectedCustomer(e.target.value)}
+            >
+              <option value="">Select a customer...</option>
+              {customers.map(c => (
+                <option key={c.id} value={c.id}>{c.name} ({c.mobile})</option>
+              ))}
+            </select>
+          </CardContent>
+        </Card>
+
+        <Card className="flex flex-col flex-grow">
+          <CardHeader className="bg-muted/50 border-b pb-4">
+            <CardTitle className="text-lg">Current Sale</CardTitle>
+          </CardHeader>
+          <CardContent className="flex-grow pt-4">
+            {cart.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">
+                Cart is empty. Add parts to continue.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {cart.map(item => (
+                  <div key={item.part_id} className="flex justify-between items-center border-b pb-3">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm line-clamp-1">{item.part_name}</p>
+                      <p className="text-xs text-muted-foreground">₹{item.selling_price} x {item.quantity}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Input 
+                        type="number" 
+                        min="1" 
+                        max={item.max_stock}
+                        value={item.quantity}
+                        onChange={(e) => updateQuantity(item.part_id, parseInt(e.target.value) || 1)}
+                        className="w-16 h-8 text-center px-1"
+                      />
+                      <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.part_id)} className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+          <div className="border-t p-4 bg-muted/50 space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Subtotal</span>
+              <span className="font-medium">₹{subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Discount (₹)</span>
+              <Input 
+                type="number" 
+                min="0"
+                value={discount || ''}
+                onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                className="w-24 h-8 text-right"
+              />
+            </div>
+            <div className="border-t pt-3 flex justify-between items-center text-lg font-bold">
+              <span>Total</span>
+              <span className="text-green-700">₹{grandTotal.toFixed(2)}</span>
+            </div>
+            <Button 
+              className="w-full mt-4" 
+              size="lg" 
+              onClick={handleSubmit} 
+              disabled={cart.length === 0 || !selectedCustomer || isPending}
+            >
+              {isPending ? 'Processing...' : 'Complete Sale'}
+            </Button>
+          </div>
+        </Card>
+      </div>
+      
+    </div>
+  );
+}
