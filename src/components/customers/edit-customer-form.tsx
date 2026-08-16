@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useState, useActionState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateCustomer } from '@/app/actions/customer-actions';
 
@@ -32,7 +32,6 @@ const formSchema = z.object({
 export function EditCustomerForm({ customer }: { customer: any }) {
   const router = useRouter();
   const updateCustomerWithId = updateCustomer.bind(null, customer.id);
-  const [state, formAction] = useActionState(updateCustomerWithId, undefined);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
