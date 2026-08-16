@@ -14,7 +14,11 @@ const registerSchema = z.object({
 
 export async function loginAction(prevState: any, formData: FormData) {
   try {
-    await signIn('credentials', formData);
+    await signIn('credentials', {
+      username: formData.get('username'),
+      password: formData.get('password'),
+      redirectTo: '/dashboard',
+    });
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
