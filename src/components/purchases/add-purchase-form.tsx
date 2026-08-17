@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Plus, Trash2, Truck, Package } from 'lucide-react';
+import { Search, Plus, Trash2, Truck, Package, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function AddPurchaseForm({ parts }: { parts: any[] }) {
@@ -18,6 +18,15 @@ export function AddPurchaseForm({ parts }: { parts: any[] }) {
   const [cart, setCart] = useState<any[]>([]);
   const [searchPart, setSearchPart] = useState('');
   const [isPending, setIsPending] = useState(false);
+  const [visiblePrices, setVisiblePrices] = useState<string[]>([]);
+
+  const togglePriceVisibility = (part_id: string) => {
+    if (visiblePrices.includes(part_id)) {
+      setVisiblePrices(visiblePrices.filter(id => id !== part_id));
+    } else {
+      setVisiblePrices([...visiblePrices, part_id]);
+    }
+  };
 
   const filteredParts = parts.filter(p => 
     p.status === 'ACTIVE' && 
@@ -190,18 +199,43 @@ export function AddPurchaseForm({ parts }: { parts: any[] }) {
                       </div>
                       <div className="flex flex-col items-center">
                         <label className="text-xs text-muted-foreground">Unit Cost (₹)</label>
-                        <Input 
-                          type="number" 
-                          min="0" 
-                          step="0.01"
-                          value={item.purchase_price}
-                          onChange={(e) => updatePrice(item.part_id, parseFloat(e.target.value) || 0)}
-                          className="w-28 text-center h-8"
-                        />
+                        {!visiblePrices.includes(item.part_id) ? (
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm"
+                            className="w-28 h-8 flex items-center justify-center gap-2 text-muted-foreground"
+                            onClick={() => togglePriceVisibility(item.part_id)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <div className="relative">
+                            <Input 
+                              type="number" 
+                              min="0" 
+                              step="0.01"
+                              value={item.purchase_price}
+                              onChange={(e) => updatePrice(item.part_id, parseFloat(e.target.value) || 0)}
+                              className="w-28 text-center h-8 pr-7"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-0 top-0 h-8 w-7 hover:bg-transparent text-muted-foreground"
+                              onClick={() => togglePriceVisibility(item.part_id)}
+                            >
+                              <EyeOff className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-col items-end w-20">
                         <label className="text-xs text-muted-foreground">Total</label>
-                        <span className="font-medium text-sm pt-1">₹{(item.quantity * item.purchase_price).toFixed(2)}</span>
+                        <span className="font-medium text-sm pt-1">
+                          {!visiblePrices.includes(item.part_id) ? '₹***' : `₹${(item.quantity * item.purchase_price).toFixed(2)}`}
+                        </span>
                       </div>
                       <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.part_id)} className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 mt-4">
                         <Trash2 className="h-4 w-4" />

@@ -113,18 +113,7 @@ export default function RegisterForm() {
               )}
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="role" className="text-slate-200 ml-1">Role</Label>
-              <select
-                id="role"
-                name="role"
-                className="flex h-12 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30 transition-colors appearance-none [&>option]:bg-slate-900 [&>option]:text-white"
-                defaultValue="STAFF"
-              >
-                <option value="STAFF">Staff (Standard Access)</option>
-                <option value="ADMIN">Admin (Full Access)</option>
-              </select>
-            </div>
+
 
             {state?.message && (
               <div className={`p-4 rounded-xl flex items-center text-sm animate-in fade-in slide-in-from-top-2 ${state.success ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/50' : 'bg-red-500/20 text-red-200 border border-red-500/50'}`}>

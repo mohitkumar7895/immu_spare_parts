@@ -23,7 +23,7 @@ export async function getCustomers(searchQuery?: string): Promise<Customer[]> {
       WHERE name LIKE ? 
       OR mobile LIKE ? 
       OR location LIKE ? 
-      ORDER BY created_at DESC
+      ORDER BY name ASC
     `;
     const searchParam = `%${searchQuery}%`;
     params = [searchParam, searchParam, searchParam];

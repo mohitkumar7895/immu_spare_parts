@@ -46,42 +46,44 @@ export default async function CustomersPage(props: {
         </form>
       </div>
 
-      <div className="rounded-md border bg-card overflow-hidden shadow-sm">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead>Name</TableHead>
-              <TableHead>Mobile</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Registered</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {customers.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
-                  No customers found.
-                </TableCell>
+      <div className="rounded-md border bg-card shadow-sm">
+        <div className="overflow-x-auto w-full">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead>Name</TableHead>
+                <TableHead>Mobile</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Registered</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : (
-              customers.map((customer) => (
-                <TableRow key={customer.id}>
-                  <TableCell className="font-medium">{customer.name}</TableCell>
-                  <TableCell>{customer.mobile}</TableCell>
-                  <TableCell>{customer.location || '-'}</TableCell>
-                  <TableCell>{new Date(customer.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right">
-                    <Link href={`/dashboard/customers/${customer.id}`} className={buttonVariants({ variant: "ghost", size: "icon" })}>
-                        <Eye className="h-4 w-4" />
-                        <span className="sr-only">View</span>
-                    </Link>
+            </TableHeader>
+            <TableBody>
+              {customers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center">
+                    No customers found.
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                customers.map((customer: any) => (
+                  <TableRow key={customer.id}>
+                    <TableCell className="font-medium">{customer.name}</TableCell>
+                    <TableCell>{customer.mobile}</TableCell>
+                    <TableCell>{customer.location || '-'}</TableCell>
+                    <TableCell>{new Date(customer.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">
+                      <Link href={`/dashboard/customers/${customer.id}`} className={buttonVariants({ variant: "ghost", size: "icon" })}>
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">View</span>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

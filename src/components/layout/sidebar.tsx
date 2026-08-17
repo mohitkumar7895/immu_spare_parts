@@ -15,10 +15,8 @@ import {
   Receipt
 } from 'lucide-react';
 
-const navItems = [
+export const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Customers', href: '/dashboard/customers', icon: Users },
-  { name: 'Vehicles', href: '/dashboard/vehicles', icon: Car },
   { name: 'Inventory', href: '/dashboard/inventory', icon: Package },
   { name: 'Purchases', href: '/dashboard/purchases', icon: Receipt },
   { name: 'Sales', href: '/dashboard/sales', icon: ShoppingCart },

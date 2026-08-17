@@ -29,10 +29,6 @@ export default async function PurchasesPage() {
           <h1 className="text-3xl font-bold tracking-tight">Purchases</h1>
           <p className="text-muted-foreground">Manage stock purchases from suppliers.</p>
         </div>
-        <Link href="/dashboard/purchases/add" className={buttonVariants({ variant: "default" })}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Purchase
-          </Link>
       </div>
 
       <div className="flex items-center gap-2 max-w-sm">
@@ -47,44 +43,46 @@ export default async function PurchasesPage() {
         </form>
       </div>
 
-      <div className="rounded-md border bg-card overflow-hidden shadow-sm">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead>Purchase No.</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Supplier</TableHead>
-              <TableHead>Invoice Ref</TableHead>
-              <TableHead className="text-right">Total Amount</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {purchases.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
-                  No purchases found.
-                </TableCell>
+      <div className="rounded-md border bg-card shadow-sm">
+        <div className="overflow-x-auto w-full">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead>Purchase No.</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Supplier</TableHead>
+                <TableHead>Invoice Ref</TableHead>
+                <TableHead className="text-right">Total Amount</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : (
-              purchases.map((purchase: any) => (
-                <TableRow key={purchase.id}>
-                  <TableCell className="font-medium">{purchase.purchase_number}</TableCell>
-                  <TableCell>{new Date(purchase.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>{purchase.supplier_name}</TableCell>
-                  <TableCell>{purchase.invoice_number || '-'}</TableCell>
-                  <TableCell className="text-right font-bold">₹{purchase.total_amount}</TableCell>
-                  <TableCell className="text-right">
-                    <Link href={`/dashboard/purchases/${purchase.id}`} className={buttonVariants({ variant: "ghost", size: "icon" })}>
-                        <Eye className="h-4 w-4" />
-                        <span className="sr-only">View</span>
-                    </Link>
+            </TableHeader>
+            <TableBody>
+              {purchases.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-24 text-center">
+                    No purchases found.
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                purchases.map((purchase: any) => (
+                  <TableRow key={purchase.id}>
+                    <TableCell className="font-medium">{purchase.purchase_number}</TableCell>
+                    <TableCell>{new Date(purchase.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>{purchase.supplier_name}</TableCell>
+                    <TableCell>{purchase.invoice_number || '-'}</TableCell>
+                    <TableCell className="text-right font-bold">₹{purchase.total_amount}</TableCell>
+                    <TableCell className="text-right">
+                      <Link href={`/dashboard/purchases/${purchase.id}`} className={buttonVariants({ variant: "ghost", size: "icon" })}>
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">View</span>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

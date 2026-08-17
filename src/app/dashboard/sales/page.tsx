@@ -42,52 +42,54 @@ export default async function SalesPage() {
         </form>
       </div>
 
-      <div className="rounded-md border bg-card overflow-hidden shadow-sm">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead>Sale No.</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Vehicle</TableHead>
-              <TableHead className="text-right">Subtotal</TableHead>
-              <TableHead className="text-right">Discount</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sales.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center">
-                  No sales found.
-                </TableCell>
+      <div className="rounded-md border bg-card shadow-sm">
+        <div className="overflow-x-auto w-full">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead>Sale No.</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Vehicle</TableHead>
+                <TableHead className="text-right">Subtotal</TableHead>
+                <TableHead className="text-right">Discount</TableHead>
+                <TableHead className="text-right">Total</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : (
-              sales.map((sale: any) => (
-                <TableRow key={sale.id}>
-                  <TableCell className="font-medium">{sale.sale_number}</TableCell>
-                  <TableCell>{new Date(sale.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>{sale.customer_name || 'Walk-in Customer'}</TableCell>
-                  <TableCell>{sale.vehicle_number || '-'}</TableCell>
-                  <TableCell className="text-right">₹{sale.subtotal}</TableCell>
-                  <TableCell className="text-right">₹{sale.discount}</TableCell>
-                  <TableCell className="text-right font-bold text-green-700">₹{sale.grand_total}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Link href={`/dashboard/sales/${sale.id}`} className={buttonVariants({ variant: "ghost", size: "icon" })}>
-                        <Eye className="h-4 w-4" />
-                        <span className="sr-only">View</span>
-                    </Link>
-                    <Link href={`/dashboard/sales/${sale.id}/invoice`} title="Invoice" className={buttonVariants({ variant: "ghost", size: "icon" })}>
-                        <FileText className="h-4 w-4 text-blue-600" />
-                        <span className="sr-only">Invoice</span>
-                    </Link>
+            </TableHeader>
+            <TableBody>
+              {sales.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="h-24 text-center">
+                    No sales found.
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                sales.map((sale: any) => (
+                  <TableRow key={sale.id}>
+                    <TableCell className="font-medium">{sale.sale_number}</TableCell>
+                    <TableCell>{new Date(sale.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>{sale.customer_name || 'Walk-in Customer'}</TableCell>
+                    <TableCell>{sale.vehicle_number || '-'}</TableCell>
+                    <TableCell className="text-right">₹{sale.subtotal}</TableCell>
+                    <TableCell className="text-right">₹{sale.discount}</TableCell>
+                    <TableCell className="text-right font-bold text-green-700">₹{sale.grand_total}</TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Link href={`/dashboard/sales/${sale.id}`} className={buttonVariants({ variant: "ghost", size: "icon" })}>
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">View</span>
+                      </Link>
+                      <Link href={`/dashboard/sales/${sale.id}/invoice`} title="Invoice" className={buttonVariants({ variant: "ghost", size: "icon" })}>
+                          <FileText className="h-4 w-4 text-blue-600" />
+                          <span className="sr-only">Invoice</span>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

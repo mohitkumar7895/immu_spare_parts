@@ -9,7 +9,7 @@ const registerSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   username: z.string().min(3, { message: 'Username must be at least 3 characters.' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
-  role: z.enum(['ADMIN', 'STAFF']).default('STAFF'),
+  role: z.enum(['ADMIN', 'STAFF']).default('ADMIN'),
 });
 
 export async function loginAction(prevState: any, formData: FormData) {
@@ -47,7 +47,13 @@ export async function registerAction(prevState: any, formData: FormData) {
 
     const { name, username, password, role } = validatedData.data;
 
-    // Check if user already exists
+    // Restrict registration to a single admin user
+    const [totalUsers]: any = await pool.query('SELECT COUNT(*) as count FROM users');
+    if (totalUsers[0].count > 0) {
+      return { success: false, message: 'Registration is closed. An admin account already exists.' };
+    }
+
+    // Check if username already exists (just in case)
     const [existingUsers]: any = await pool.query(
       'SELECT id FROM users WHERE username = ?',
       [username]

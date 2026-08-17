@@ -6,6 +6,7 @@ import * as z from 'zod';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updatePart } from '@/app/actions/inventory-actions';
+import { Eye, EyeOff } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -28,7 +29,6 @@ const formSchema = z.object({
   company_name: z.string().min(2, 'Company name is required'),
   purchase_price: z.coerce.number().min(0, 'Must be positive'),
   selling_price: z.coerce.number().min(0, 'Must be positive'),
-  secret_cost: z.coerce.number().min(0, 'Must be positive'),
   current_stock: z.coerce.number().min(0).int(),
   minimum_stock: z.coerce.number().min(0).int(),
   description: z.string().optional(),
@@ -38,6 +38,7 @@ export function EditPartForm({ part }: { part: any }) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPrice, setShowPrice] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,7 +49,6 @@ export function EditPartForm({ part }: { part: any }) {
       company_name: part.company_name || '',
       purchase_price: Number(part.purchase_price) || 0,
       selling_price: Number(part.selling_price) || 0,
-      secret_cost: Number(part.secret_cost) || 0,
       current_stock: Number(part.current_stock) || 0,
       minimum_stock: Number(part.minimum_stock) || 0,
       description: part.description || '',
@@ -162,33 +162,44 @@ export function EditPartForm({ part }: { part: any }) {
                     control={form.control}
                     name="purchase_price"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Purchase Price (₹)</FormLabel>
-                        <FormControl>
-                          <Input type="number" step="0.01" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                      <div className="flex flex-col justify-end h-[76px]">
+                        {!showPrice ? (
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            className="w-full h-10 flex items-center justify-center text-muted-foreground"
+                            onClick={() => setShowPrice(true)}
+                            title="Show Purchase Price"
+                          >
+                            <Eye className="h-5 w-5" />
+                          </Button>
+                        ) : (
+                          <FormItem>
+                            <FormLabel>Purchase Price (₹)</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input type="number" step="0.01" {...field} className="pr-10" />
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground"
+                                  onClick={() => setShowPrice(false)}
+                                  title="Hide Price"
+                                >
+                                  <EyeOff className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      </div>
                     )}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="secret_cost"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Secret Cost (₹)</FormLabel>
-                        <FormControl>
-                          <Input type="number" step="0.01" {...field} />
-                        </FormControl>
-                        <FormDescription>ADMIN only visibility</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   <FormField
                     control={form.control}
                     name="current_stock"

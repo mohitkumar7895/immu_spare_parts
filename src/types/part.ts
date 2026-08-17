@@ -6,7 +6,6 @@ export interface Part {
   company_name: string;
   purchase_price: number;
   selling_price: number;
-  secret_cost: number;
   opening_stock: number;
   current_stock: number;
   minimum_stock: number;
@@ -24,7 +23,6 @@ export interface CreatePartDTO {
   company_name: string;
   purchase_price: number;
   selling_price: number;
-  secret_cost: number;
   opening_stock: number;
   minimum_stock: number;
   description?: string;
@@ -38,7 +36,6 @@ export interface UpdatePartDTO {
   company_name?: string;
   purchase_price?: number;
   selling_price?: number;
-  secret_cost?: number;
   current_stock?: number;
   minimum_stock?: number;
   description?: string;

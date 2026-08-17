@@ -25,7 +25,7 @@ export async function getParts(searchQuery?: string): Promise<Part[]> {
       OR part_name LIKE ? 
       OR vehicle_name LIKE ? 
       OR company_name LIKE ?
-      ORDER BY created_at DESC
+      ORDER BY part_name ASC
     `;
     const searchParam = `%${searchQuery}%`;
     params = [searchParam, searchParam, searchParam, searchParam];
@@ -33,7 +33,7 @@ export async function getParts(searchQuery?: string): Promise<Part[]> {
 
   const [rows] = await pool.query<RowDataPacket[]>(query, params);
   
-  // Expose secret_cost and purchase_price only to ADMIN
+  // Expose purchase_price only to ADMIN
   const isAdmin = session.user.role === 'ADMIN';
   
   return rows.map((row) => {
@@ -41,7 +41,6 @@ export async function getParts(searchQuery?: string): Promise<Part[]> {
     if (!isAdmin) {
       // Staff shouldn't see these fields
       // Using 0 or -1 as a masked value for frontend type consistency
-      part.secret_cost = 0;
       part.purchase_price = 0; 
     }
     return part;
@@ -59,7 +58,6 @@ export async function getPartById(id: string): Promise<Part | null> {
   const part = rows[0] as Part;
   
   if (session.user.role !== 'ADMIN') {
-    part.secret_cost = 0;
     part.purchase_price = 0;
   }
   
@@ -84,12 +82,12 @@ export async function addPart(data: CreatePartDTO) {
   await pool.query(
     `INSERT INTO parts (
       id, part_number, part_name, vehicle_name, company_name, 
-      purchase_price, selling_price, secret_cost, opening_stock, 
+      purchase_price, selling_price, opening_stock, 
       current_stock, minimum_stock, description
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id, data.part_number, data.part_name, data.vehicle_name, data.company_name,
-      data.purchase_price, data.selling_price, data.secret_cost, data.opening_stock,
+      data.purchase_price, data.selling_price, data.opening_stock,
       current_stock, data.minimum_stock, data.description || null
     ]
   );
@@ -117,7 +115,7 @@ export async function updatePart(id: string, data: UpdatePartDTO) {
 
   const updateFields = [
     'part_number', 'part_name', 'vehicle_name', 'company_name', 
-    'purchase_price', 'selling_price', 'secret_cost', 
+    'purchase_price', 'selling_price', 
     'current_stock', 'minimum_stock', 'description'
   ] as const;
   

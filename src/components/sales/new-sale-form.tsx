@@ -6,14 +6,29 @@ import { createSale } from '@/app/actions/transaction-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Plus, Trash2, User as UserIcon, Package } from 'lucide-react';
+import { Search, Plus, Trash2, User as UserIcon, Package, Phone, MapPin, Car } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Props passed down from server containing all customers and active parts
 export function NewSaleForm({ customers, parts }: { customers: any[], parts: any[] }) {
   const router = useRouter();
-  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
-  const [discount, setDiscount] = useState<number>(0);
+  const [customerName, setCustomerName] = useState<string>('');
+  const [customerMobile, setCustomerMobile] = useState<string>('');
+  const [customerAddress, setCustomerAddress] = useState<string>('');
+  const [vehicleNumber, setVehicleNumber] = useState<string>('');
+
+  const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setCustomerMobile(val);
+    
+    // Auto-fill logic
+    const existing = customers.find(c => c.mobile === val);
+    if (existing) {
+      setCustomerName(existing.name);
+      setCustomerAddress(existing.address || '');
+    }
+  };
+  const [discountPercent, setDiscountPercent] = useState<number>(0);
   const [cart, setCart] = useState<any[]>([]);
   const [searchPart, setSearchPart] = useState('');
   const [isPending, setIsPending] = useState(false);
@@ -60,11 +75,12 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
   };
 
   const subtotal = cart.reduce((acc, item) => acc + (item.selling_price * item.quantity), 0);
-  const grandTotal = subtotal - discount;
+  const discountAmount = subtotal * (discountPercent / 100);
+  const grandTotal = subtotal - discountAmount;
 
   const handleSubmit = async () => {
-    if (!selectedCustomer) {
-      toast.error('Please select a customer');
+    if (!customerName.trim() || !customerMobile.trim()) {
+      toast.error('Customer Name and Mobile are required');
       return;
     }
     if (cart.length === 0) {
@@ -75,8 +91,11 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
     setIsPending(true);
     try {
       const payload = {
-        customer_id: selectedCustomer,
-        discount: discount,
+        customer_name: customerName,
+        customer_mobile: customerMobile,
+        customer_address: customerAddress,
+        vehicle_number: vehicleNumber,
+        discount: discountAmount,
         items: cart.map(i => ({ part_id: i.part_id, quantity: i.quantity, selling_price: i.selling_price }))
       };
       
@@ -146,17 +165,60 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
               Customer
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <select 
-              className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-              value={selectedCustomer}
-              onChange={(e) => setSelectedCustomer(e.target.value)}
-            >
-              <option value="">Select a customer...</option>
-              {customers.map(c => (
-                <option key={c.id} value={c.id}>{c.name} ({c.mobile})</option>
-              ))}
-            </select>
+          <CardContent className="space-y-4 pt-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-muted-foreground">Mobile Number <span className="text-destructive">*</span></label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="e.g. 9876543210" 
+                  value={customerMobile}
+                  onChange={handleMobileChange}
+                  className="pl-9"
+                  type="tel"
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground ml-1">Auto-fills details if customer exists</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-muted-foreground">Customer Name <span className="text-destructive">*</span></label>
+              <div className="relative">
+                <UserIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="e.g. Rahul Kumar" 
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-muted-foreground">Location / Address</label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="e.g. Delhi, India" 
+                  value={customerAddress}
+                  onChange={(e) => setCustomerAddress(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5 pt-3 border-t mt-1">
+              <label className="text-sm font-medium text-muted-foreground">Vehicle Number</label>
+              <div className="relative">
+                <Car className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="e.g. DL 1C AB 1234 (Optional)" 
+                  value={vehicleNumber}
+                  onChange={(e) => setVehicleNumber(e.target.value)}
+                  className="pl-9 uppercase"
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -201,14 +263,20 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
               <span className="font-medium">₹{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Discount (₹)</span>
-              <Input 
-                type="number" 
-                min="0"
-                value={discount || ''}
-                onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                className="w-24 h-8 text-right"
-              />
+              <span className="text-muted-foreground">Discount (%)</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">
+                  (-₹{discountAmount.toFixed(2)})
+                </span>
+                <Input 
+                  type="number" 
+                  min="0"
+                  max="100"
+                  value={discountPercent || ''}
+                  onChange={(e) => setDiscountPercent(parseFloat(e.target.value) || 0)}
+                  className="w-20 h-8 text-right"
+                />
+              </div>
             </div>
             <div className="border-t pt-3 flex justify-between items-center text-lg font-bold">
               <span>Total</span>
@@ -218,7 +286,7 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
               className="w-full mt-4" 
               size="lg" 
               onClick={handleSubmit} 
-              disabled={cart.length === 0 || !selectedCustomer || isPending}
+              disabled={cart.length === 0 || !customerName || !customerMobile || isPending}
             >
               {isPending ? 'Processing...' : 'Complete Sale'}
             </Button>

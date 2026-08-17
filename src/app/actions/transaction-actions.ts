@@ -22,8 +22,10 @@ async function generateSaleNumber(connection: any): Promise<string> {
 }
 
 export interface CreateSaleDTO {
-  customer_id: string;
-  vehicle_id?: string;
+  customer_name: string;
+  customer_mobile: string;
+  customer_address?: string;
+  vehicle_number?: string;
   discount: number;
   notes?: string;
   items: {
@@ -44,6 +46,19 @@ export async function createSale(data: CreateSaleDTO) {
     const saleId = generateId('sal');
     const saleNumber = await generateSaleNumber(connection);
     
+    // Find or create customer by mobile
+    let customerId = '';
+    const [existingCustomers] = await connection.query<RowDataPacket[]>('SELECT id FROM customers WHERE mobile = ?', [data.customer_mobile]);
+    if (existingCustomers.length > 0) {
+      customerId = existingCustomers[0].id;
+    } else {
+      customerId = generateId('cus');
+      await connection.query(
+        'INSERT INTO customers (id, name, mobile, address) VALUES (?, ?, ?, ?)',
+        [customerId, data.customer_name, data.customer_mobile, data.customer_address || null]
+      );
+    }
+
     let subtotal = 0;
     
     // Process items and check stock BEFORE creating sale
@@ -68,11 +83,23 @@ export async function createSale(data: CreateSaleDTO) {
     
     const grandTotal = subtotal - data.discount;
 
+    let vehicleId = null;
+    if (data.vehicle_number && data.vehicle_number.trim() !== '') {
+      const vNum = data.vehicle_number.trim();
+      const [vRows] = await connection.query<RowDataPacket[]>('SELECT id FROM vehicles WHERE vehicle_number = ?', [vNum]);
+      if (vRows.length > 0) {
+        vehicleId = vRows[0].id;
+      } else {
+        vehicleId = generateId('veh');
+        await connection.query('INSERT INTO vehicles (id, vehicle_number, vehicle_name, customer_id) VALUES (?, ?, ?, ?)', [vehicleId, vNum, 'Added via Sale', customerId]);
+      }
+    }
+
     // Create Sale
     await connection.query(
       `INSERT INTO sales (id, sale_number, customer_id, vehicle_id, subtotal, discount, grand_total, notes, created_by_id)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [saleId, saleNumber, data.customer_id, data.vehicle_id || null, subtotal, data.discount, grandTotal, data.notes || null, session.user.id]
+      [saleId, saleNumber, customerId, vehicleId, subtotal, data.discount, grandTotal, data.notes || null, session.user.id]
     );
 
     // Create Sale Items, Deduct Stock, Create Stock Movements

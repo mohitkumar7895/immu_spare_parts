@@ -6,6 +6,7 @@ import { ArrowLeft, Edit, Activity, ShoppingCart, Receipt } from 'lucide-react';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { HiddenPrice } from '@/components/inventory/hidden-price';
 
 export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -113,13 +114,11 @@ export default async function PartDetailsPage(props: { params: Promise<{ id: str
               <>
                 <div className="grid grid-cols-2">
                   <span className="text-muted-foreground">Purchase Price:</span>
-                  <span className="font-medium text-muted-foreground">₹{part.purchase_price}</span>
+                  <div className="flex justify-start">
+                    <HiddenPrice price={part.purchase_price} />
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 pt-2 border-t mt-2">
-                  <span className="text-muted-foreground">Secret Cost:</span>
-                  <span className="font-medium text-red-700">₹{part.secret_cost}</span>
-                </div>
-                <div className="grid grid-cols-2">
                   <span className="text-muted-foreground">Est. Profit Margin:</span>
                   <span className="font-medium text-green-600">
                     {(((part.selling_price - part.purchase_price) / part.selling_price) * 100).toFixed(1)}%
