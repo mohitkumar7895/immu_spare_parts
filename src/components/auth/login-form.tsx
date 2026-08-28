@@ -90,11 +90,18 @@ export function LoginForm() {
             <SubmitButton />
           </form>
           
-          <div className="mt-8 text-center text-sm text-slate-400">
-            Don't have an account?{' '}
-            <Link href="/register" className="text-white hover:text-blue-300 hover:underline transition-colors font-medium">
-              Create one now
-            </Link>
+          <div className="mt-8 flex flex-col space-y-3 text-center text-sm text-slate-400">
+            <div>
+              Don't have an account?{' '}
+              <Link href="/register" className="text-white hover:text-blue-300 hover:underline transition-colors font-medium">
+                Create one now
+              </Link>
+            </div>
+            <div>
+              <Link href="/forgot-password" className="text-slate-400 hover:text-white hover:underline transition-colors text-sm">
+                Forgot your password?
+              </Link>
+            </div>
           </div>
         </div>
       </div>

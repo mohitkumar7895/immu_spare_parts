@@ -111,7 +111,7 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="flex flex-col-reverse lg:grid lg:grid-cols-3 gap-6">
       
       {/* Left side: Search & Parts */}
       <div className="lg:col-span-2 space-y-4">
@@ -133,7 +133,7 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
               />
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto pr-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 max-h-[300px] lg:max-h-[500px] overflow-y-auto pr-2">
               {filteredParts.slice(0, 12).map(part => (
                 <div key={part.id} className="border rounded-lg p-3 hover:border-primary cursor-pointer transition-colors" onClick={() => addToCart(part)}>
                   <p className="font-semibold text-sm truncate" title={part.part_name}>{part.part_name}</p>

@@ -47,11 +47,8 @@ export async function registerAction(prevState: any, formData: FormData) {
 
     const { name, username, password, role } = validatedData.data;
 
-    // Restrict registration to a single admin user
     const [totalUsers]: any = await pool.query('SELECT COUNT(*) as count FROM users');
-    if (totalUsers[0].count > 0) {
-      return { success: false, message: 'Registration is closed. An admin account already exists.' };
-    }
+    const assignedRole = totalUsers[0].count === 0 ? 'ADMIN' : 'STAFF';
 
     // Check if username already exists (just in case)
     const [existingUsers]: any = await pool.query(
@@ -73,7 +70,7 @@ export async function registerAction(prevState: any, formData: FormData) {
       INSERT INTO users (id, name, username, password, role)
       VALUES (?, ?, ?, ?, ?)
       `,
-      [userId, name, username, password, role]
+      [userId, name, username, password, assignedRole]
     );
 
     return { success: true, message: 'Registration successful! You can now login.' };

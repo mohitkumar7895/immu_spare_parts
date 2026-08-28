@@ -40,7 +40,7 @@ export function Header({ user }: { user: any }) {
 
   return (
     <header className="h-16 border-b bg-background flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-20 w-full">
-      <div className="flex items-center flex-1">
+      <div className="flex items-center flex-1 min-w-0">
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
           <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden mr-2" />}>
             <Menu className="h-5 w-5" />
