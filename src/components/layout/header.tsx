@@ -21,7 +21,9 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
-export function Header({ user }: { user: any }) {
+import { Wrench } from 'lucide-react';
+
+export function Header({ user, companyLogo }: { user: any, companyLogo?: string | null }) {
   const router = useRouter();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,6 +53,15 @@ export function Header({ user }: { user: any }) {
             <SheetDescription className="sr-only">Sidebar navigation</SheetDescription>
             
             <div className="h-16 flex items-center px-6 border-b border-white/10 pr-12">
+              {companyLogo ? (
+                <div className="h-8 max-w-[140px] mr-3 flex items-center justify-start">
+                  <img src={companyLogo} alt="Logo" className="max-h-full max-w-full object-contain drop-shadow-md" />
+                </div>
+              ) : (
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center mr-3 shadow-lg shadow-primary/20 shrink-0">
+                  <Wrench className="w-4 h-4 text-white" />
+                </div>
+              )}
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400 whitespace-nowrap">
                 Spare Parts
               </span>
