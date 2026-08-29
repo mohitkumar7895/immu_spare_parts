@@ -1,12 +1,13 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Load env first
+// Load env FIRST
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
-import pool from '../src/lib/db';
-
 async function main() {
+  // Use dynamic import so it happens AFTER env is loaded
+  const { default: pool } = await import('../src/lib/db');
+
   console.log('Attempting to add columns using Next.js DB pool...');
   try {
     const [columns] = await pool.query(`SHOW COLUMNS FROM users LIKE 'email'`);
@@ -18,9 +19,9 @@ async function main() {
         ADD COLUMN reset_otp VARCHAR(10),
         ADD COLUMN reset_otp_expiry DATETIME
       `);
-      console.log('Successfully added email and OTP columns!');
+      console.log('SUCCESS: Added email and OTP columns!');
     } else {
-      console.log('Columns already exist!');
+      console.log('SUCCESS: Columns already exist!');
     }
   } catch (error: any) {
     console.error('Migration failed:', error);
