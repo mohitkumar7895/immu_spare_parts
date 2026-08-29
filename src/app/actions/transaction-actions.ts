@@ -282,3 +282,26 @@ export async function getPurchases() {
   return rows;
 }
 
+export async function getPurchaseById(id: string) {
+  const session = await auth();
+  if (session?.user?.role !== 'ADMIN') throw new Error('Unauthorized');
+
+  const [purchaseRows] = await pool.query<RowDataPacket[]>(`
+    SELECT * FROM purchases WHERE id = ?
+  `, [id]);
+  
+  if (purchaseRows.length === 0) return null;
+  const purchase = purchaseRows[0] as any;
+
+  const [itemRows] = await pool.query<RowDataPacket[]>(`
+    SELECT pi.*, p.part_name, p.part_number 
+    FROM purchase_items pi 
+    JOIN parts p ON pi.part_id = p.id
+    WHERE pi.purchase_id = ?
+  `, [id]);
+  
+  return {
+    ...purchase,
+    items: itemRows
+  };
+}

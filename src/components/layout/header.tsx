@@ -101,9 +101,13 @@ export function Header({ user }: { user: any }) {
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 overflow-hidden ring-2 ring-transparent transition-all hover:ring-primary/50 focus-visible:ring-primary/50" />}>
-            <div className="h-full w-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-              </div>
+            <div className="h-full w-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm overflow-hidden">
+              {user?.avatar ? (
+                <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+              )}
+            </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end">
             <div className="px-2 py-1.5 text-sm font-normal">
