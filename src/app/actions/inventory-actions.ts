@@ -15,6 +15,17 @@ export async function getParts(searchQuery?: string): Promise<Part[]> {
   const session = await auth();
   if (!session?.user) throw new Error('Unauthorized');
 
+  // Auto-migration for mechanic_price
+  try {
+    const [columns] = await pool.query(`SHOW COLUMNS FROM parts LIKE 'mechanic_price'`);
+    if ((columns as any[]).length === 0) {
+      await pool.query(`ALTER TABLE parts ADD COLUMN mechanic_price DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER selling_price`);
+      console.log('Auto-migration: Added mechanic_price column to parts table.');
+    }
+  } catch (migErr) {
+    console.error('Auto-migration failed for parts table:', migErr);
+  }
+
   let query = 'SELECT * FROM parts ORDER BY created_at DESC';
   let params: any[] = [];
 
@@ -82,12 +93,12 @@ export async function addPart(data: CreatePartDTO) {
   await pool.query(
     `INSERT INTO parts (
       id, part_number, part_name, vehicle_name, company_name, 
-      purchase_price, selling_price, opening_stock, 
+      purchase_price, selling_price, mechanic_price, opening_stock, 
       current_stock, minimum_stock, description
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id, data.part_number, data.part_name, data.vehicle_name, data.company_name,
-      data.purchase_price, data.selling_price, data.opening_stock,
+      data.purchase_price, data.selling_price, data.mechanic_price, data.opening_stock,
       current_stock, data.minimum_stock, data.description || null
     ]
   );
@@ -115,7 +126,7 @@ export async function updatePart(id: string, data: UpdatePartDTO) {
 
   const updateFields = [
     'part_number', 'part_name', 'vehicle_name', 'company_name', 
-    'purchase_price', 'selling_price', 
+    'purchase_price', 'selling_price', 'mechanic_price', 
     'current_stock', 'minimum_stock', 'description'
   ] as const;
   

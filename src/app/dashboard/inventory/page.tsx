@@ -61,7 +61,8 @@ export default async function InventoryPage(props: {
                 <TableHead>Vehicle</TableHead>
                 <TableHead>Company</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
-                <TableHead className="text-right">Selling Price</TableHead>
+                <TableHead className="text-right">Retail Price</TableHead>
+                <TableHead className="text-right text-indigo-400">Mechanic Price</TableHead>
                 {isAdmin && <TableHead className="text-right text-muted-foreground">Purchase Price</TableHead>}
                 <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -95,6 +96,7 @@ export default async function InventoryPage(props: {
                       </div>
                     </TableCell>
                     <TableCell className="text-right font-bold">₹{part.selling_price}</TableCell>
+                    <TableCell className="text-right font-bold text-indigo-400">₹{part.mechanic_price}</TableCell>
                     {isAdmin && (
                       <TableCell className="text-right flex justify-end">
                         <HiddenPrice price={part.purchase_price} />

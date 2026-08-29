@@ -29,6 +29,7 @@ const formSchema = z.object({
   company_name: z.string().min(2, 'Company name is required'),
   purchase_price: z.coerce.number().min(0, 'Must be positive'),
   selling_price: z.coerce.number().min(0, 'Must be positive'),
+  mechanic_price: z.coerce.number().min(0, 'Must be positive'),
   current_stock: z.coerce.number().min(0).int(),
   minimum_stock: z.coerce.number().min(0).int(),
   description: z.string().optional(),
@@ -49,6 +50,7 @@ export function EditPartForm({ part }: { part: any }) {
       company_name: part.company_name || '',
       purchase_price: Number(part.purchase_price) || 0,
       selling_price: Number(part.selling_price) || 0,
+      mechanic_price: Number(part.mechanic_price) || 0,
       current_stock: Number(part.current_stock) || 0,
       minimum_stock: Number(part.minimum_stock) || 0,
       description: part.description || '',
@@ -158,6 +160,22 @@ export function EditPartForm({ part }: { part: any }) {
                     )}
                   />
 
+                  <FormField
+                    control={form.control}
+                    name="mechanic_price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mechanic Price (₹)</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.01" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="purchase_price"

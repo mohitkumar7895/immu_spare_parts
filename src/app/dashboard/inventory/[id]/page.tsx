@@ -107,8 +107,12 @@ export default async function PartDetailsPage(props: { params: Promise<{ id: str
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="grid grid-cols-2">
-              <span className="text-muted-foreground">Selling Price:</span>
+              <span className="text-muted-foreground">Retail Price:</span>
               <span className="font-bold text-lg">₹{part.selling_price}</span>
+            </div>
+            <div className="grid grid-cols-2">
+              <span className="text-muted-foreground">Mechanic Price:</span>
+              <span className="font-bold text-lg text-indigo-400">₹{part.mechanic_price}</span>
             </div>
             {isAdmin && (
               <>
