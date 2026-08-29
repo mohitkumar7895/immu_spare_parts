@@ -1,11 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function HiddenPrice({ price }: { price: number | string }) {
   const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (show) {
+      timeout = setTimeout(() => {
+        setShow(false);
+      }, 5000);
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [show]);
   
   if (!show) {
     return (
