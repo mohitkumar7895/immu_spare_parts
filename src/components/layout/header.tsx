@@ -46,10 +46,17 @@ export function Header({ user }: { user: any }) {
             <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle Menu</span>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0">
+          <SheetContent side="left" className="w-64 p-0 border-r border-white/10 flex flex-col bg-background/95 backdrop-blur-xl">
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <SheetDescription className="sr-only">Sidebar navigation</SheetDescription>
-            <div className="flex-1 overflow-y-auto py-6">
+            
+            <div className="h-16 flex items-center px-6 border-b border-white/10 pr-12">
+              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400 whitespace-nowrap">
+                Spare Parts
+              </span>
+            </div>
+
+            <div className="flex-1 overflow-y-auto py-4">
               <nav className="space-y-1 px-3">
                 {filteredItems.map((item: any) => {
                   const isActive = item.exact 

@@ -44,11 +44,9 @@ export function Sidebar({ user, companyLogo }: { user: any, companyLogo?: string
             <Wrench className="w-4 h-4 text-white" />
           </div>
         )}
-        {!companyLogo && (
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
-            Spare Parts
-          </span>
-        )}
+        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400 whitespace-nowrap">
+          Spare Parts
+        </span>
       </div>
       <div className="flex-1 overflow-y-auto py-6">
         <nav className="space-y-2 px-4">

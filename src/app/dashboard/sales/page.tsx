@@ -15,9 +15,11 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-export default async function SalesPage() {
+export default async function SalesPage(props: { searchParams?: Promise<{ q?: string }> }) {
+  const searchParams = await props.searchParams;
+  const query = searchParams?.q || '';
   const session = await auth();
-  const sales = await getSales(true);
+  const sales = await getSales(true, query);
 
   return (
     <div className="space-y-6">

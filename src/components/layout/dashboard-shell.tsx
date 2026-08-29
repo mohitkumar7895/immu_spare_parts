@@ -10,7 +10,7 @@ export function DashboardShell({ children, user, companyLogo }: { children: Reac
 
       <Sidebar user={user} companyLogo={companyLogo} />
       <div className="relative z-10 flex-1 flex flex-col md:pl-64 min-w-0 bg-transparent">
-        <Header user={user} />
+        <Header user={user} companyLogo={companyLogo} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 min-w-0">
           {children}
         </main>
