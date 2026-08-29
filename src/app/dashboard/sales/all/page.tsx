@@ -2,7 +2,7 @@ import { getSales } from '@/app/actions/transaction-actions';
 import { auth } from '@/lib/auth';
 import Link from 'next/link';
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Plus, Search, Eye, FileText } from 'lucide-react';
+import { Plus, Search, Eye, FileText, ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -13,20 +13,21 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-export default async function SalesPage() {
+export default async function AllSalesPage() {
   const session = await auth();
-  const sales = await getSales(true);
+  const sales = await getSales(false); // Fetch ALL sales without the 24h limit
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Recent Sales</h1>
-          <p className="text-muted-foreground">Showing sales from the last 24 hours.</p>
+          <h1 className="text-3xl font-bold tracking-tight">All Sales</h1>
+          <p className="text-muted-foreground">Complete history of all sales transactions.</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/dashboard/sales/all" className={buttonVariants({ variant: "outline" })}>
-            View All Sales
+          <Link href="/dashboard/sales" className={buttonVariants({ variant: "outline" })}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Recent Sales
           </Link>
           <Link href="/dashboard/sales/new" className={buttonVariants({ variant: "default" })}>
             <Plus className="mr-2 h-4 w-4" />

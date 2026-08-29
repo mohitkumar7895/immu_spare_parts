@@ -139,17 +139,24 @@ export async function createSale(data: CreateSaleDTO) {
   }
 }
 
-export async function getSales(): Promise<Sale[]> {
+export async function getSales(last24Hours: boolean = false): Promise<Sale[]> {
   const session = await auth();
   if (!session?.user) throw new Error('Unauthorized');
 
-  const [rows] = await pool.query<RowDataPacket[]>(`
+  let query = `
     SELECT s.*, c.name as customer_name, v.vehicle_number 
     FROM sales s 
     LEFT JOIN customers c ON s.customer_id = c.id
     LEFT JOIN vehicles v ON s.vehicle_id = v.id
-    ORDER BY s.created_at DESC
-  `);
+  `;
+  
+  if (last24Hours) {
+    query += ` WHERE s.created_at >= NOW() - INTERVAL 1 DAY `;
+  }
+  
+  query += ` ORDER BY s.created_at DESC`;
+
+  const [rows] = await pool.query<RowDataPacket[]>(query);
   
   return rows as any; // Cast generic row to extended sale object for UI
 }
