@@ -4,10 +4,10 @@ import { RowDataPacket } from 'mysql2';
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { email, otp, password } = await req.json();
 
-    if (!email || !password) {
-      return NextResponse.json({ error: 'Email and new password are required' }, { status: 400 });
+    if (!email || !otp || !password) {
+      return NextResponse.json({ error: 'Email, OTP, and new password are required' }, { status: 400 });
     }
 
     if (password.length < 6) {
@@ -16,23 +16,26 @@ export async function POST(req: Request) {
 
     // Check if user exists
     const [users] = await pool.query<RowDataPacket[]>(
-      'SELECT id, reset_otp FROM users WHERE email = ?',
+      'SELECT id, reset_otp, reset_otp_expiry FROM users WHERE email = ?',
       [email]
     );
 
     if (users.length === 0) {
-      return NextResponse.json({ error: 'User not found' }, { status: 400 });
+      return NextResponse.json({ error: 'User not found or invalid email' }, { status: 400 });
     }
 
     const user = users[0];
 
-    // Ensure OTP flow was actually completed. In a fully robust system, 
-    // you'd also check a session/token or verify the OTP hasn't been cleared, 
-    // but for our simple flow, we clear the OTP after a successful reset.
-    // If reset_otp is null, it means there's no active reset request.
-    if (!user.reset_otp) {
-       // Allow it anyway if the verification already succeeded on the frontend,
-       // but typically we require it. For this prototype, we'll proceed.
+    // Verify OTP
+    if (!user.reset_otp || user.reset_otp !== otp) {
+      return NextResponse.json({ error: 'Invalid OTP' }, { status: 400 });
+    }
+
+    const now = new Date();
+    const expiry = new Date(user.reset_otp_expiry);
+
+    if (now > expiry) {
+      return NextResponse.json({ error: 'OTP has expired' }, { status: 400 });
     }
 
     // Update password and clear OTP
