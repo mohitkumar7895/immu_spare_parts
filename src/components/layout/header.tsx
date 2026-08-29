@@ -51,8 +51,10 @@ export function Header({ user }: { user: any }) {
             <SheetDescription className="sr-only">Sidebar navigation</SheetDescription>
             <div className="flex-1 overflow-y-auto py-6">
               <nav className="space-y-1 px-3">
-                {filteredItems.map((item) => {
-                  const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                {filteredItems.map((item: any) => {
+                  const isActive = item.exact 
+                    ? pathname === item.href 
+                    : (pathname === item.href || pathname.startsWith(item.href + '/'));
                   const Icon = item.icon;
                   return (
                     <Link

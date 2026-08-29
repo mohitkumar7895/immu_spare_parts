@@ -19,7 +19,8 @@ export const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Inventory', href: '/dashboard/inventory', icon: Package },
   { name: 'Purchases', href: '/dashboard/purchases', icon: Receipt },
-  { name: 'Sales', href: '/dashboard/sales', icon: ShoppingCart },
+  { name: 'Recent Sales', href: '/dashboard/sales', icon: ShoppingCart, exact: true },
+  { name: 'All Sales', href: '/dashboard/sales/all', icon: ShoppingCart },
   { name: 'Reports', href: '/dashboard/reports', icon: BarChart3, requireAdmin: true },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings, requireAdmin: true },
 ];
@@ -43,8 +44,10 @@ export function Sidebar({ userRole }: { userRole: 'ADMIN' | 'STAFF' }) {
       </div>
       <div className="flex-1 overflow-y-auto py-6">
         <nav className="space-y-2 px-4">
-          {filteredItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          {filteredItems.map((item: any) => {
+            const isActive = item.exact 
+              ? pathname === item.href 
+              : (pathname === item.href || pathname.startsWith(item.href + '/'));
             const Icon = item.icon;
             
             return (
