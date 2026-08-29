@@ -4,7 +4,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTransition, useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search, Loader2 } from 'lucide-react';
-import { useDebounce } from '@/hooks/use-debounce'; // Wait, I might not have a debounce hook
 
 export function SearchInput({ placeholder = "Search..." }: { placeholder?: string }) {
   const router = useRouter();
