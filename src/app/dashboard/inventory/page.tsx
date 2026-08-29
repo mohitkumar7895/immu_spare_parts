@@ -62,8 +62,12 @@ export default async function InventoryPage(props: {
                 <TableHead>Company</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
                 <TableHead className="text-right">Retail Price</TableHead>
-                <TableHead className="text-right text-indigo-400">Mechanic Price</TableHead>
-                {isAdmin && <TableHead className="text-right text-muted-foreground">Purchase Price</TableHead>}
+                {isAdmin && (
+                  <>
+                    <TableHead className="text-right text-indigo-400">Mechanic Price</TableHead>
+                    <TableHead className="text-right text-muted-foreground">Purchase Price</TableHead>
+                  </>
+                )}
                 <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -96,11 +100,15 @@ export default async function InventoryPage(props: {
                       </div>
                     </TableCell>
                     <TableCell className="text-right font-bold">₹{part.selling_price}</TableCell>
-                    <TableCell className="text-right font-bold text-indigo-400">₹{part.mechanic_price}</TableCell>
                     {isAdmin && (
-                      <TableCell className="text-right flex justify-end">
-                        <HiddenPrice price={part.purchase_price} />
-                      </TableCell>
+                      <>
+                        <TableCell className="text-right flex justify-end">
+                          <HiddenPrice price={part.mechanic_price} />
+                        </TableCell>
+                        <TableCell className="text-right flex justify-end">
+                          <HiddenPrice price={part.purchase_price} />
+                        </TableCell>
+                      </>
                     )}
                     <TableCell className="text-center">
                       <Badge variant={part.status === 'ACTIVE' ? 'default' : 'outline'} className={part.status === 'ACTIVE' ? 'bg-green-600 hover:bg-green-700' : ''}>

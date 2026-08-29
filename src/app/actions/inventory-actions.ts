@@ -53,6 +53,7 @@ export async function getParts(searchQuery?: string): Promise<Part[]> {
       // Staff shouldn't see these fields
       // Using 0 or -1 as a masked value for frontend type consistency
       part.purchase_price = 0; 
+      part.mechanic_price = 0;
     }
     return part;
   });
@@ -70,6 +71,7 @@ export async function getPartById(id: string): Promise<Part | null> {
   
   if (session.user.role !== 'ADMIN') {
     part.purchase_price = 0;
+    part.mechanic_price = 0;
   }
   
   return part;
