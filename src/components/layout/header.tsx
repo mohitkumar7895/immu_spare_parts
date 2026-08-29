@@ -39,7 +39,7 @@ export function Header({ user }: { user: any }) {
   };
 
   return (
-    <header className="h-16 border-b bg-background flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-20 w-full">
+    <header className="h-16 bg-background/30 backdrop-blur-2xl border-b border-white/10 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-20 w-full shadow-sm">
       <div className="flex items-center flex-1 min-w-0">
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
           <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden mr-2" />}>
@@ -81,14 +81,14 @@ export function Header({ user }: { user: any }) {
           </SheetContent>
         </Sheet>
         <div className="max-w-md w-full ml-2 md:ml-0">
-          <form onSubmit={handleSearch} className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search className="h-4 w-4 text-muted-foreground" />
+          <form onSubmit={handleSearch} className="relative group">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+              <Search className="h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             </div>
             <Input 
               type="search" 
               placeholder="Search parts, customers, invoices..." 
-              className="pl-10 w-full bg-muted border-transparent focus:bg-background" 
+              className="pl-11 rounded-full h-10 bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground focus:bg-white/10 focus:border-primary/50 transition-all shadow-inner" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
