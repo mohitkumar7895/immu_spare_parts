@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { RowDataPacket } from 'mysql2';
-import { Resend } from 'resend';
+import { sendOTP } from '@/lib/mailer';
 
 export async function POST(req: Request) {
   try {
-    const resend = new Resend(process.env.RESEND_API_KEY);
     const { email } = await req.json();
 
     if (!email) {
@@ -38,25 +37,11 @@ export async function POST(req: Request) {
       [otp, expiry, user.id]
     );
 
-    // Send email using Resend
-    const { error } = await resend.emails.send({
-      from: 'onboarding@resend.dev', // Default sender for Resend free tier
-      to: email,
-      subject: 'Your Password Reset OTP',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>Password Reset Request</h2>
-          <p>Hello ${user.name},</p>
-          <p>We received a request to reset your password. Here is your One-Time Password (OTP):</p>
-          <h1 style="background: #f4f4f4; padding: 10px; text-align: center; letter-spacing: 5px; font-size: 32px;">${otp}</h1>
-          <p>This code will expire in 10 minutes.</p>
-          <p>If you didn't request a password reset, you can safely ignore this email.</p>
-        </div>
-      `,
-    });
-
-    if (error) {
-      console.error('Resend Error:', error);
+    // Send email using custom mailer
+    try {
+      await sendOTP(email, otp);
+    } catch (error) {
+      console.error('Mailer Error:', error);
       return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
     }
 
