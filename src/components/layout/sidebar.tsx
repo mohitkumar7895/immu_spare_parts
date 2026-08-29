@@ -62,6 +62,7 @@ export function Sidebar({ user, companyLogo }: { user: any, companyLogo?: string
               <Link
                 key={item.name}
                 href={item.href}
+                prefetch={true}
                 className={cn(
                   "flex items-center px-3 py-2.5 text-sm font-medium rounded-xl group transition-all duration-300",
                   isActive 

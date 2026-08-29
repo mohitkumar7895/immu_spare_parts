@@ -13,14 +13,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { SearchInput } from '@/components/shared/search-input';
 
-export default async function PurchasesPage() {
+export default async function PurchasesPage(props: { searchParams?: Promise<{ q?: string }> }) {
+  const searchParams = await props.searchParams;
+  const query = searchParams?.q || '';
   const session = await auth();
   if (session?.user?.role !== 'ADMIN') {
     redirect('/dashboard');
   }
   
-  const purchases = await getPurchases();
+  const purchases = await getPurchases(query);
 
   return (
     <div className="space-y-6">
@@ -32,15 +36,7 @@ export default async function PurchasesPage() {
       </div>
 
       <div className="flex items-center gap-2 max-w-sm">
-        <form className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            name="q"
-            placeholder="Search purchases..."
-            className="pl-8"
-          />
-        </form>
+        <SearchInput placeholder="Search purchases by supplier or invoice..." />
       </div>
 
       <div className="rounded-md border bg-card shadow-sm">
@@ -48,10 +44,10 @@ export default async function PurchasesPage() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
-                <TableHead>Purchase No.</TableHead>
+                <TableHead className="hidden md:table-cell">Purchase No.</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Supplier</TableHead>
-                <TableHead>Invoice Ref</TableHead>
+                <TableHead className="hidden sm:table-cell">Invoice Ref</TableHead>
                 <TableHead className="text-right">Total Amount</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -66,12 +62,22 @@ export default async function PurchasesPage() {
               ) : (
                 purchases.map((purchase: any) => (
                   <TableRow key={purchase.id}>
-                    <TableCell className="font-medium">{purchase.purchase_number}</TableCell>
-                    <TableCell>{new Date(purchase.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{purchase.supplier_name}</TableCell>
-                    <TableCell>{purchase.invoice_number || '-'}</TableCell>
-                    <TableCell className="text-right font-bold">₹{purchase.total_amount}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="font-medium hidden md:table-cell">{purchase.purchase_number}</TableCell>
+                    <TableCell>
+                      {new Date(purchase.created_at).toLocaleDateString()}
+                      <div className="text-xs text-muted-foreground md:hidden mt-1">
+                        {purchase.purchase_number}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-semibold">{purchase.supplier_name}</div>
+                      <div className="text-xs text-muted-foreground sm:hidden mt-1">
+                        Inv: {purchase.invoice_number || '-'}
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">{purchase.invoice_number || '-'}</TableCell>
+                    <TableCell className="text-right font-bold text-primary">₹{purchase.total_amount}</TableCell>
+                    <TableCell className="text-right flex justify-end">
                       <Link href={`/dashboard/purchases/${purchase.id}`} className={buttonVariants({ variant: "ghost", size: "icon" })}>
                           <Eye className="h-4 w-4" />
                           <span className="sr-only">View</span>

@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { HiddenPrice } from '@/components/inventory/hidden-price';
+import { SearchInput } from '@/components/shared/search-input';
 
 export default async function InventoryPage(props: {
   searchParams: Promise<{ q?: string }>;
@@ -39,16 +40,7 @@ export default async function InventoryPage(props: {
       </div>
 
       <div className="flex items-center gap-2 max-w-sm">
-        <form className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            name="q"
-            placeholder="Search parts..."
-            className="pl-8"
-            defaultValue={searchParams.q}
-          />
-        </form>
+        <SearchInput placeholder="Search parts..." />
       </div>
 
       <div className="rounded-md border bg-card shadow-sm">
@@ -56,19 +48,19 @@ export default async function InventoryPage(props: {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
-                <TableHead>Part No.</TableHead>
+                <TableHead className="hidden md:table-cell">Part No.</TableHead>
                 <TableHead>Part Name</TableHead>
-                <TableHead>Vehicle</TableHead>
-                <TableHead>Company</TableHead>
+                <TableHead className="hidden sm:table-cell">Vehicle</TableHead>
+                <TableHead className="hidden lg:table-cell">Company</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
                 <TableHead className="text-right">Retail Price</TableHead>
                 {isAdmin && (
                   <>
-                    <TableHead className="text-right text-indigo-400">Mechanic Price</TableHead>
-                    <TableHead className="text-right text-muted-foreground">Purchase Price</TableHead>
+                    <TableHead className="text-right text-indigo-400 hidden md:table-cell">Mechanic Price</TableHead>
+                    <TableHead className="text-right text-muted-foreground hidden lg:table-cell">Purchase Price</TableHead>
                   </>
                 )}
-                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center hidden sm:table-cell">Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -82,10 +74,16 @@ export default async function InventoryPage(props: {
               ) : (
                 parts.map((part) => (
                   <TableRow key={part.id}>
-                    <TableCell className="font-medium">{part.part_number}</TableCell>
-                    <TableCell>{part.part_name}</TableCell>
-                    <TableCell>{part.vehicle_name}</TableCell>
-                    <TableCell>{part.company_name}</TableCell>
+                    <TableCell className="font-medium hidden md:table-cell">{part.part_number}</TableCell>
+                    <TableCell>
+                      <div className="font-semibold">{part.part_name}</div>
+                      <div className="text-xs text-muted-foreground sm:hidden flex flex-col gap-1 mt-1">
+                        <span>{part.vehicle_name}</span>
+                        <span>₹{part.mechanic_price} (Mech)</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">{part.vehicle_name}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{part.company_name}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <Badge variant={part.current_stock > part.minimum_stock ? "secondary" : "destructive"}>
@@ -94,27 +92,27 @@ export default async function InventoryPage(props: {
                         {part.current_stock <= part.minimum_stock && (
                           <span className="text-[10px] text-destructive mt-1 flex items-center">
                             <AlertTriangle className="h-3 w-3 mr-1" />
-                            Low Stock
+                            Low
                           </span>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="text-right font-bold">₹{part.selling_price}</TableCell>
+                    <TableCell className="text-right font-bold text-primary">₹{part.selling_price}</TableCell>
                     {isAdmin && (
                       <>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right hidden md:table-cell">
                           <div className="flex justify-end">
                             <HiddenPrice price={part.mechanic_price} />
                           </div>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right hidden lg:table-cell">
                           <div className="flex justify-end">
                             <HiddenPrice price={part.purchase_price} />
                           </div>
                         </TableCell>
                       </>
                     )}
-                    <TableCell className="text-center">
+                    <TableCell className="text-center hidden sm:table-cell">
                       <Badge variant={part.status === 'ACTIVE' ? 'default' : 'outline'} className={part.status === 'ACTIVE' ? 'bg-green-600 hover:bg-green-700' : ''}>
                         {part.status}
                       </Badge>

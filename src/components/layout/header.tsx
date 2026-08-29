@@ -60,6 +60,7 @@ export function Header({ user }: { user: any }) {
                     <Link
                       key={item.name}
                       href={item.href}
+                      prefetch={true}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={cn(
                         "flex items-center px-3 py-2 text-sm font-medium rounded-md group transition-colors",

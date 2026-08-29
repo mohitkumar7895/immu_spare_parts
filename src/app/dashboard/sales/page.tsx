@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Plus, Search, Eye, FileText } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { SearchInput } from '@/components/shared/search-input';
 import {
   Table,
   TableBody,
@@ -36,15 +38,7 @@ export default async function SalesPage() {
       </div>
 
       <div className="flex items-center gap-2 max-w-sm">
-        <form className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            name="q"
-            placeholder="Search sale number, customer..."
-            className="pl-8"
-          />
-        </form>
+        <SearchInput placeholder="Search sales by customer or vehicle..." />
       </div>
 
       <div className="rounded-md border bg-card shadow-sm">
@@ -52,34 +46,40 @@ export default async function SalesPage() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
-                <TableHead>Sale No.</TableHead>
+                <TableHead className="hidden md:table-cell">Sale No.</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Customer</TableHead>
-                <TableHead>Vehicle</TableHead>
-                <TableHead className="text-right">Subtotal</TableHead>
-                <TableHead className="text-right">Discount</TableHead>
-                <TableHead className="text-right">Total</TableHead>
+                <TableHead className="hidden sm:table-cell">Vehicle</TableHead>
+                <TableHead className="text-right">Total Amount</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sales.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center">
+                  <TableCell colSpan={6} className="h-24 text-center">
                     No sales found.
                   </TableCell>
                 </TableRow>
               ) : (
                 sales.map((sale: any) => (
                   <TableRow key={sale.id}>
-                    <TableCell className="font-medium">{sale.sale_number}</TableCell>
-                    <TableCell>{new Date(sale.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{sale.customer_name || 'Walk-in Customer'}</TableCell>
-                    <TableCell>{sale.vehicle_number || '-'}</TableCell>
-                    <TableCell className="text-right">₹{sale.subtotal}</TableCell>
-                    <TableCell className="text-right">₹{sale.discount}</TableCell>
-                    <TableCell className="text-right font-bold text-green-700">₹{sale.grand_total}</TableCell>
-                    <TableCell className="text-right space-x-2">
+                    <TableCell className="font-medium hidden md:table-cell">{sale.sale_number}</TableCell>
+                    <TableCell>
+                      {new Date(sale.created_at).toLocaleDateString()}
+                      <div className="text-xs text-muted-foreground md:hidden mt-1">
+                        {sale.sale_number}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-semibold">{sale.customer_name || 'Walk-in'}</div>
+                      <div className="text-xs text-muted-foreground sm:hidden mt-1">
+                        {sale.vehicle_number || 'No Vehicle'}
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">{sale.vehicle_number || '-'}</TableCell>
+                    <TableCell className="text-right font-bold text-primary">₹{sale.grand_total}</TableCell>
+                    <TableCell className="text-right space-x-2 flex justify-end">
                       <Link href={`/dashboard/sales/${sale.id}`} className={buttonVariants({ variant: "ghost", size: "icon" })}>
                           <Eye className="h-4 w-4" />
                           <span className="sr-only">View</span>

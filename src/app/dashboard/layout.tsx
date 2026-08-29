@@ -21,23 +21,23 @@ export default async function DashboardLayout({
   }
 
   let avatar = null;
-  try {
-    const [rows] = await pool.query<RowDataPacket[]>('SELECT avatar FROM users WHERE id = ?', [session.user.id]);
-    if (rows[0] && rows[0].avatar) {
-      avatar = rows[0].avatar;
-    }
-  } catch (e) {
-    console.error('Failed to fetch user avatar in layout:', e);
-  }
-
   let companyLogo = null;
+
   try {
-    const [logoRows] = await pool.query<RowDataPacket[]>('SELECT setting_value FROM app_settings WHERE setting_key = "company_logo"');
-    if (logoRows.length > 0) {
-      companyLogo = logoRows[0].setting_value;
+    const [avatarResult, logoResult] = await Promise.allSettled([
+      pool.query<RowDataPacket[]>('SELECT avatar FROM users WHERE id = ?', [session.user.id]),
+      pool.query<RowDataPacket[]>('SELECT setting_value FROM app_settings WHERE setting_key = "company_logo"')
+    ]);
+
+    if (avatarResult.status === 'fulfilled' && avatarResult.value[0].length > 0) {
+      avatar = avatarResult.value[0][0].avatar || null;
+    }
+
+    if (logoResult.status === 'fulfilled' && logoResult.value[0].length > 0) {
+      companyLogo = logoResult.value[0][0].setting_value || null;
     }
   } catch (e) {
-    // Table might not exist yet
+    console.error('Failed to fetch global layout data:', e);
   }
 
   const enrichedUser = {

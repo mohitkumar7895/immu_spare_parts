@@ -139,24 +139,33 @@ export async function createSale(data: CreateSaleDTO) {
   }
 }
 
-export async function getSales(last24Hours: boolean = false): Promise<Sale[]> {
+export async function getSales(last24Hours: boolean = false, query: string = ''): Promise<Sale[]> {
   const session = await auth();
   if (!session?.user) throw new Error('Unauthorized');
 
-  let query = `
+  let sqlQuery = `
     SELECT s.*, c.name as customer_name, v.vehicle_number 
     FROM sales s 
     LEFT JOIN customers c ON s.customer_id = c.id
     LEFT JOIN vehicles v ON s.vehicle_id = v.id
+    WHERE 1=1
   `;
   
+  const params: any[] = [];
+
   if (last24Hours) {
-    query += ` WHERE s.created_at >= NOW() - INTERVAL 1 DAY `;
+    sqlQuery += ` AND s.created_at >= NOW() - INTERVAL 1 DAY `;
+  }
+
+  if (query && query.trim() !== '') {
+    sqlQuery += ` AND (s.sale_number LIKE ? OR c.name LIKE ? OR v.vehicle_number LIKE ?) `;
+    const q = `%${query.trim()}%`;
+    params.push(q, q, q);
   }
   
-  query += ` ORDER BY s.created_at DESC`;
+  sqlQuery += ` ORDER BY s.created_at DESC`;
 
-  const [rows] = await pool.query<RowDataPacket[]>(query);
+  const [rows] = await pool.query<RowDataPacket[]>(sqlQuery, params);
   
   return rows as any; // Cast generic row to extended sale object for UI
 }
@@ -271,13 +280,22 @@ export async function createPurchase(data: CreatePurchaseDTO) {
   }
 }
 
-export async function getPurchases() {
+export async function getPurchases(query: string = '') {
   const session = await auth();
   if (session?.user?.role !== 'ADMIN') throw new Error('Unauthorized');
 
-  const [rows] = await pool.query<RowDataPacket[]>(`
-    SELECT * FROM purchases ORDER BY created_at DESC
-  `);
+  let sqlQuery = `SELECT * FROM purchases WHERE 1=1`;
+  const params: any[] = [];
+
+  if (query && query.trim() !== '') {
+    sqlQuery += ` AND (purchase_number LIKE ? OR supplier_name LIKE ? OR invoice_number LIKE ?) `;
+    const q = `%${query.trim()}%`;
+    params.push(q, q, q);
+  }
+
+  sqlQuery += ` ORDER BY created_at DESC`;
+
+  const [rows] = await pool.query<RowDataPacket[]>(sqlQuery, params);
   
   return rows;
 }
