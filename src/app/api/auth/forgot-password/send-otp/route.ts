@@ -40,15 +40,15 @@ export async function POST(req: Request) {
     // Send email using custom mailer
     try {
       await sendOTP(email, otp);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Mailer Error:', error);
-      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
+      return NextResponse.json({ error: 'Mailer Error: ' + (error.message || String(error)) }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, message: 'OTP sent successfully' });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Send OTP error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'DB/Server Error: ' + (error.message || String(error)) }, { status: 500 });
   }
 }
