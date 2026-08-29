@@ -12,7 +12,7 @@ export function HiddenPrice({ price }: { price: number | string }) {
     if (show) {
       timeout = setTimeout(() => {
         setShow(false);
-      }, 5000);
+      }, 3000);
     }
     return () => {
       if (timeout) clearTimeout(timeout);
