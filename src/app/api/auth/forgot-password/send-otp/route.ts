@@ -3,11 +3,9 @@ import pool from '@/lib/db';
 import { RowDataPacket } from 'mysql2';
 import { Resend } from 'resend';
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: Request) {
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const { email } = await req.json();
 
     if (!email) {
