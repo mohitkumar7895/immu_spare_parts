@@ -8,7 +8,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode, 
       <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/10 blur-[120px] pointer-events-none" />
 
-      <Sidebar userRole={user?.role} />
+      <Sidebar user={user} />
       <div className="relative z-10 flex-1 flex flex-col md:pl-64 min-w-0 bg-transparent">
         <Header user={user} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 min-w-0">

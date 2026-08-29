@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { updateProfileAction, updatePasswordAction } from '@/app/actions/auth-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,8 +18,27 @@ function SubmitButton({ text }: { text: string }) {
   );
 }
 
-export function ProfileForm({ user }: { user: { name: string, username: string } }) {
+export function ProfileForm({ user }: { user: { name: string, username: string, avatar?: string } }) {
   const [state, formAction] = useActionState(updateProfileAction, undefined);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(user.avatar || null);
+  const [avatarBase64, setAvatarBase64] = useState<string>(user.avatar || '');
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image must be less than 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setAvatarPreview(base64);
+        setAvatarBase64(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <Card>
@@ -28,7 +47,37 @@ export function ProfileForm({ user }: { user: { name: string, username: string }
         <CardDescription>Update your account's profile information.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4 max-w-md">
+        <form action={formAction} className="space-y-6 max-w-md">
+          
+          <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+            <div className="relative group">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-primary/20 bg-muted flex items-center justify-center">
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-3xl font-bold">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 p-1.5 bg-primary text-primary-foreground rounded-full cursor-pointer shadow-md hover:scale-105 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+              </label>
+              <input 
+                id="avatar-upload" 
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleImageChange} 
+              />
+              <input type="hidden" name="avatar" value={avatarBase64} />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-medium">Profile Picture</h4>
+              <p className="text-xs text-muted-foreground">JPG, GIF or PNG. Max size of 2MB.</p>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" name="name" defaultValue={user.name} required />

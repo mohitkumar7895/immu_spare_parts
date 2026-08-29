@@ -102,11 +102,15 @@ export default async function InventoryPage(props: {
                     <TableCell className="text-right font-bold">₹{part.selling_price}</TableCell>
                     {isAdmin && (
                       <>
-                        <TableCell className="text-right flex justify-end">
-                          <HiddenPrice price={part.mechanic_price} />
+                        <TableCell className="text-right">
+                          <div className="flex justify-end">
+                            <HiddenPrice price={part.mechanic_price} />
+                          </div>
                         </TableCell>
-                        <TableCell className="text-right flex justify-end">
-                          <HiddenPrice price={part.purchase_price} />
+                        <TableCell className="text-right">
+                          <div className="flex justify-end">
+                            <HiddenPrice price={part.purchase_price} />
+                          </div>
                         </TableCell>
                       </>
                     )}

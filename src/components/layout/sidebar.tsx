@@ -25,11 +25,11 @@ export const navItems = [
   { name: 'Settings', href: '/dashboard/settings', icon: Settings, requireAdmin: true },
 ];
 
-export function Sidebar({ userRole }: { userRole: 'ADMIN' | 'STAFF' }) {
+export function Sidebar({ user }: { user: any }) {
   const pathname = usePathname();
 
   const filteredItems = navItems.filter(
-    (item) => !item.requireAdmin || userRole === 'ADMIN'
+    (item: any) => !item.requireAdmin || user?.role === 'ADMIN'
   );
 
   return (
@@ -75,12 +75,16 @@ export function Sidebar({ userRole }: { userRole: 'ADMIN' | 'STAFF' }) {
       </div>
       <div className="p-4 m-4 rounded-2xl bg-gradient-to-b from-white/5 to-transparent border border-white/10">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border border-slate-600 flex items-center justify-center text-white font-bold shadow-inner">
-            {userRole === 'ADMIN' ? 'A' : 'S'}
+          <div className="h-10 w-10 shrink-0 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border border-slate-600 flex items-center justify-center text-white font-bold shadow-inner overflow-hidden">
+            {user?.avatar ? (
+              <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <span>{user?.name?.charAt(0)?.toUpperCase() || (user?.role === 'ADMIN' ? 'A' : 'S')}</span>
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground truncate">
-              {userRole === 'ADMIN' ? 'Administrator' : 'Staff Member'}
+              {user?.name || (user?.role === 'ADMIN' ? 'Administrator' : 'Staff Member')}
             </p>
             <p className="text-xs text-muted-foreground truncate">
               Workspace

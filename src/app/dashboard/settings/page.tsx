@@ -15,9 +15,20 @@ export default async function SettingsPage() {
     redirect('/login');
   }
 
+  // Auto-migration for avatar column
+  try {
+    const [columns] = await pool.query(`SHOW COLUMNS FROM users LIKE 'avatar'`);
+    if ((columns as any[]).length === 0) {
+      await pool.query(`ALTER TABLE users ADD COLUMN avatar LONGTEXT`);
+      console.log('Auto-migration: Added avatar column to users table.');
+    }
+  } catch (migErr) {
+    console.error('Auto-migration failed for users table:', migErr);
+  }
+
   // Fetch latest user details from DB
-  const [rows] = await pool.query<RowDataPacket[]>('SELECT name, username, role FROM users WHERE id = ?', [session.user.id]);
-  const user = rows[0] as { name: string, username: string, role: string };
+  const [rows] = await pool.query<RowDataPacket[]>('SELECT name, username, role, avatar FROM users WHERE id = ?', [session.user.id]);
+  const user = rows[0] as { name: string, username: string, role: string, avatar?: string };
 
   if (!user) {
     redirect('/login');

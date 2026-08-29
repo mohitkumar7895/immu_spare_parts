@@ -87,6 +87,7 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
 
     const name = formData.get('name') as string;
     const username = formData.get('username') as string;
+    const avatar = formData.get('avatar') as string;
 
     if (!name || !username) {
       return { success: false, message: 'Name and Username are required.' };
@@ -102,8 +103,8 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
     }
 
     await pool.query(
-      'UPDATE users SET name = ?, username = ? WHERE id = ?',
-      [name, username, session.user.id]
+      'UPDATE users SET name = ?, username = ?, avatar = ? WHERE id = ?',
+      [name, username, avatar || null, session.user.id]
     );
 
     return { success: true, message: 'Profile updated successfully. Next time you login, changes will reflect.' };
