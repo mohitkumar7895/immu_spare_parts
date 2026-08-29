@@ -13,8 +13,9 @@ import { Package, Truck, Calendar, Receipt, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-export default async function PurchaseDetailsPage({ params }: { params: { id: string } }) {
-  const purchase = await getPurchaseById(params.id);
+export default async function PurchaseDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const purchase = await getPurchaseById(id);
 
   if (!purchase) {
     notFound();

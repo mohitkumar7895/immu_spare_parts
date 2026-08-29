@@ -30,10 +30,20 @@ export default async function DashboardLayout({
     console.error('Failed to fetch user avatar in layout:', e);
   }
 
+  let companyLogo = null;
+  try {
+    const [logoRows] = await pool.query<RowDataPacket[]>('SELECT setting_value FROM app_settings WHERE setting_key = "company_logo"');
+    if (logoRows.length > 0) {
+      companyLogo = logoRows[0].setting_value;
+    }
+  } catch (e) {
+    // Table might not exist yet
+  }
+
   const enrichedUser = {
     ...session.user,
     avatar: avatar
   };
 
-  return <DashboardShell user={enrichedUser}>{children}</DashboardShell>;
+  return <DashboardShell user={enrichedUser} companyLogo={companyLogo}>{children}</DashboardShell>;
 }

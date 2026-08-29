@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from 'react';
 import { updateProfileAction, updatePasswordAction } from '@/app/actions/auth-actions';
+import { updateLogoAction } from '@/app/actions/settings-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -133,6 +134,80 @@ export function PasswordForm() {
           )}
 
           <SubmitButton text="Update Password" />
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function LogoForm({ currentLogo }: { currentLogo?: string | null }) {
+  const [state, formAction] = useActionState(updateLogoAction, undefined);
+  const [logoPreview, setLogoPreview] = useState<string | null>(currentLogo || null);
+  const [logoBase64, setLogoBase64] = useState<string>(currentLogo || '');
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image must be less than 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setLogoPreview(base64);
+        setLogoBase64(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Company Logo</CardTitle>
+        <CardDescription>Upload your company logo to display on the dashboard.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form action={formAction} className="space-y-6 max-w-md">
+          
+          <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+            <div className="relative group">
+              <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-primary/20 bg-muted flex items-center justify-center">
+                {logoPreview ? (
+                  <img src={logoPreview} alt="Company Logo" className="w-full h-full object-contain p-2" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white/50 text-sm font-medium">
+                    No Logo
+                  </div>
+                )}
+              </div>
+              <label htmlFor="logo-upload" className="absolute -bottom-2 -right-2 p-1.5 bg-primary text-primary-foreground rounded-full cursor-pointer shadow-md hover:scale-105 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+              </label>
+              <input 
+                id="logo-upload" 
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleImageChange} 
+              />
+              <input type="hidden" name="logo" value={logoBase64} />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-medium">Brand Image</h4>
+              <p className="text-xs text-muted-foreground">Transparent PNG recommended. Max 2MB.</p>
+            </div>
+          </div>
+
+          {state?.message && (
+            <div className={`p-3 rounded-md flex items-center text-sm ${state.success ? 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400' : 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400'}`}>
+              <AlertCircle className="w-4 h-4 mr-2" />
+              {state.message}
+            </div>
+          )}
+
+          <SubmitButton text="Save Logo" />
         </form>
       </CardContent>
     </Card>

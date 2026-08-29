@@ -25,7 +25,7 @@ export const navItems = [
   { name: 'Settings', href: '/dashboard/settings', icon: Settings, requireAdmin: true },
 ];
 
-export function Sidebar({ user }: { user: any }) {
+export function Sidebar({ user, companyLogo }: { user: any, companyLogo?: string | null }) {
   const pathname = usePathname();
 
   const filteredItems = navItems.filter(
@@ -35,11 +35,17 @@ export function Sidebar({ user }: { user: any }) {
   return (
     <aside className="w-64 bg-background/30 backdrop-blur-2xl border-r border-white/10 h-screen flex flex-col fixed inset-y-0 left-0 z-20 hidden md:flex shadow-[4px_0_24px_-10px_rgba(0,0,0,0.5)]">
       <div className="h-16 flex items-center px-6 border-b border-white/10">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center mr-3 shadow-lg shadow-primary/20">
-          <Wrench className="w-4 h-4 text-white" />
-        </div>
-        <span className="font-bold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-          SpareParts
+        {companyLogo ? (
+          <div className="w-8 h-8 rounded-lg overflow-hidden mr-3 flex items-center justify-center bg-white/5">
+            <img src={companyLogo} alt="Logo" className="w-full h-full object-contain" />
+          </div>
+        ) : (
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center mr-3 shadow-lg shadow-primary/20">
+            <Wrench className="w-4 h-4 text-white" />
+          </div>
+        )}
+        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
+          Spare Parts
         </span>
       </div>
       <div className="flex-1 overflow-y-auto py-6">
