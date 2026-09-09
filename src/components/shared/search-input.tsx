@@ -11,13 +11,21 @@ export function SearchInput({ placeholder = "Search..." }: { placeholder?: strin
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const [value, setValue] = useState(searchParams.get('q') || '');
+  const currentQuery = searchParams.get('q') || '';
+  const [value, setValue] = useState(currentQuery);
+
+  // Sync external changes to query param
+  useEffect(() => {
+    setValue(currentQuery);
+  }, [currentQuery]);
 
   useEffect(() => {
+    if (value.trim() === currentQuery.trim()) return;
+
     const timer = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
-      if (value) {
-        params.set('q', value);
+      if (value.trim()) {
+        params.set('q', value.trim());
       } else {
         params.delete('q');
       }
@@ -25,10 +33,10 @@ export function SearchInput({ placeholder = "Search..." }: { placeholder?: strin
       startTransition(() => {
         router.replace(`${pathname}?${params.toString()}`);
       });
-    }, 300); // 300ms debounce
+    }, 250);
 
     return () => clearTimeout(timer);
-  }, [value, pathname, router, searchParams]);
+  }, [value, currentQuery, pathname, router, searchParams]);
 
   return (
     <div className="relative flex-1">

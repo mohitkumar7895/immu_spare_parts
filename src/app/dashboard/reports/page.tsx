@@ -21,12 +21,12 @@ export default async function ReportsPage() {
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Reports & Analytics</h1>
-          <p className="text-muted-foreground">Financial and operational reports for Administrators.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Reports & Analytics</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-0.5">Financial and operational reports for Administrators.</p>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         
         {/* Sales Report Card */}
         <Card className="flex flex-col">

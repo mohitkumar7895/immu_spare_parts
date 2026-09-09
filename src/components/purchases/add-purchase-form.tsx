@@ -182,32 +182,43 @@ export function AddPurchaseForm({ parts }: { parts: any[] }) {
             ) : (
               <div className="space-y-4">
                 {cart.map(item => (
-                  <div key={item.part_id} className="flex flex-col sm:flex-row justify-between sm:items-center border-b pb-3 gap-2">
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{item.part_name}</p>
+                  <div key={item.part_id} className="border-b pb-3 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <p className="font-semibold text-sm leading-snug flex-1 pr-2">{item.part_name}</p>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => removeFromCart(item.part_id)} 
+                        className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 shrink-0 -mt-1 -mr-1"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Remove</span>
+                      </Button>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex flex-col items-center">
-                        <label className="text-xs text-muted-foreground">Qty</label>
+                    
+                    <div className="grid grid-cols-3 gap-2 sm:gap-3 items-end">
+                      <div>
+                        <label className="text-[11px] text-muted-foreground block mb-1 font-medium">Qty</label>
                         <Input 
                           type="number" 
                           min="1" 
                           value={item.quantity}
                           onChange={(e) => updateQuantity(item.part_id, parseInt(e.target.value) || 1)}
-                          className="w-20 text-center h-8"
+                          className="w-full text-center h-8 text-sm"
                         />
                       </div>
-                      <div className="flex flex-col items-center">
-                        <label className="text-xs text-muted-foreground">Unit Cost (₹)</label>
+                      <div>
+                        <label className="text-[11px] text-muted-foreground block mb-1 font-medium">Unit Cost (₹)</label>
                         {!visiblePrices.includes(item.part_id) ? (
                           <Button 
                             type="button" 
                             variant="outline" 
                             size="sm"
-                            className="w-28 h-8 flex items-center justify-center gap-2 text-muted-foreground"
+                            className="w-full h-8 flex items-center justify-center gap-1.5 text-muted-foreground text-xs"
                             onClick={() => togglePriceVisibility(item.part_id)}
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-3.5 w-3.5" />
+                            <span>Show</span>
                           </Button>
                         ) : (
                           <div className="relative">
@@ -217,13 +228,13 @@ export function AddPurchaseForm({ parts }: { parts: any[] }) {
                               step="0.01"
                               value={item.purchase_price}
                               onChange={(e) => updatePrice(item.part_id, parseFloat(e.target.value) || 0)}
-                              className="w-28 text-center h-8 pr-7"
+                              className="w-full text-center h-8 pr-6 text-sm"
                             />
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="absolute right-0 top-0 h-8 w-7 hover:bg-transparent text-muted-foreground"
+                              className="absolute right-0 top-0 h-8 w-6 hover:bg-transparent text-muted-foreground"
                               onClick={() => togglePriceVisibility(item.part_id)}
                             >
                               <EyeOff className="h-3 w-3" />
@@ -231,15 +242,12 @@ export function AddPurchaseForm({ parts }: { parts: any[] }) {
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-col items-end w-20">
-                        <label className="text-xs text-muted-foreground">Total</label>
-                        <span className="font-medium text-sm pt-1">
+                      <div className="text-right">
+                        <label className="text-[11px] text-muted-foreground block mb-1 font-medium">Total</label>
+                        <span className="font-semibold text-sm block py-1 text-primary">
                           {!visiblePrices.includes(item.part_id) ? '₹***' : `₹${(item.quantity * item.purchase_price).toFixed(2)}`}
                         </span>
                       </div>
-                      <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.part_id)} className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 mt-4">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   </div>
                 ))}

@@ -30,16 +30,60 @@ export default async function PurchasesPage(props: { searchParams?: Promise<{ q?
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Purchases</h1>
-          <p className="text-muted-foreground">Manage stock purchases from suppliers.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Purchases</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-0.5">Manage stock purchases from suppliers.</p>
         </div>
+        <Link href="/dashboard/purchases/add" className={buttonVariants({ variant: "default", className: "w-full sm:w-auto" })}>
+          <Plus className="mr-2 h-4 w-4" />
+          Record Purchase
+        </Link>
       </div>
 
       <div className="flex items-center gap-2 max-w-sm">
         <SearchInput placeholder="Search purchases by supplier or invoice..." />
       </div>
 
-      <div className="rounded-md border bg-card shadow-sm">
+      {/* Mobile Card List View (< md) */}
+      <div className="space-y-3 md:hidden">
+        {purchases.length === 0 ? (
+          <div className="rounded-xl border bg-card p-8 text-center text-muted-foreground">
+            No purchases found.
+          </div>
+        ) : (
+          purchases.map((purchase: any) => (
+            <div key={purchase.id} className="rounded-xl border bg-card/80 backdrop-blur-md p-4 shadow-sm space-y-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="font-mono text-xs font-semibold text-primary">{purchase.purchase_number}</span>
+                  <p className="text-xs text-muted-foreground mt-0.5">{new Date(purchase.created_at).toLocaleDateString()}</p>
+                </div>
+                <span className="text-base font-bold text-primary">₹{purchase.total_amount}</span>
+              </div>
+
+              <div className="text-xs bg-muted/40 rounded-lg p-2.5 space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Supplier:</span>
+                  <span className="font-semibold text-foreground">{purchase.supplier_name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Invoice Ref:</span>
+                  <span className="font-medium text-foreground">{purchase.invoice_number || 'N/A'}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end pt-1 border-t border-border/40">
+                <Link href={`/dashboard/purchases/${purchase.id}`} className={buttonVariants({ variant: "outline", size: "sm", className: "h-8 px-3 text-xs gap-1.5 w-full justify-center sm:w-auto" })}>
+                  <Eye className="h-3.5 w-3.5" />
+                  <span>View Details</span>
+                </Link>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View (>= md) */}
+      <div className="hidden md:block rounded-md border bg-card shadow-sm">
         <div className="overflow-x-auto w-full">
           <Table>
             <TableHeader>

@@ -27,29 +27,29 @@ export default async function CustomerDetailsPage(props: { params: Promise<{ id:
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <Link 
             href="/dashboard/customers" 
-            className="p-2 hover:bg-accent rounded-full transition-colors"
+            className="p-2 hover:bg-accent rounded-full transition-colors shrink-0"
           >
             <ArrowLeft className="h-5 w-5 text-muted-foreground" />
           </Link>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{customer.name}</h1>
-            <p className="text-muted-foreground">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">{customer.name}</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
               Customer since {new Date(customer.created_at).toLocaleDateString()}
             </p>
           </div>
         </div>
         {session?.user?.role === 'ADMIN' && (
-          <Link href={`/dashboard/customers/${customer.id}/edit`} className={buttonVariants({ variant: "outline" })}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Profile
+          <Link href={`/dashboard/customers/${customer.id}/edit`} className={buttonVariants({ variant: "outline", className: "w-full sm:w-auto justify-center" })}>
+            <Edit className="mr-2 h-4 w-4" />
+            Edit Profile
           </Link>
         )}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         {/* Contact Info */}
         <Card>
           <CardHeader>

@@ -2,7 +2,7 @@ import { getCustomers } from '@/app/actions/customer-actions';
 import { auth } from '@/lib/auth';
 import Link from 'next/link';
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Plus, Search, Eye } from 'lucide-react';
+import { Plus, Search, Eye, Phone, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -24,13 +24,13 @@ export default async function CustomersPage(props: {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-          <p className="text-muted-foreground">Manage your customer database and view history.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Customers</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-0.5">Manage your customer database and view history.</p>
         </div>
-        <Link href="/dashboard/customers/add" className={buttonVariants({ variant: "default" })}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Customer
-          </Link>
+        <Link href="/dashboard/customers/add" className={buttonVariants({ variant: "default", className: "w-full sm:w-auto" })}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Customer
+        </Link>
       </div>
 
       <div className="flex items-center gap-2 max-w-sm">
@@ -40,13 +40,57 @@ export default async function CustomersPage(props: {
             type="search"
             name="q"
             placeholder="Search customers by name, mobile..."
-            className="pl-8"
+            className="pl-8 text-xs sm:text-sm"
             defaultValue={searchParams.q}
           />
         </form>
       </div>
 
-      <div className="rounded-md border bg-card shadow-sm">
+      {/* Mobile Card List View (< md) */}
+      <div className="space-y-3 md:hidden">
+        {customers.length === 0 ? (
+          <div className="rounded-xl border bg-card p-8 text-center text-muted-foreground">
+            No customers found.
+          </div>
+        ) : (
+          customers.map((customer: any) => (
+            <div key={customer.id} className="rounded-xl border bg-card/80 backdrop-blur-md p-4 shadow-sm space-y-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-semibold text-base text-foreground leading-snug">{customer.name}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Joined {new Date(customer.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <Link href={`/dashboard/customers/${customer.id}`} className={buttonVariants({ variant: "outline", size: "sm", className: "h-8 px-2.5 text-xs gap-1" })}>
+                  <Eye className="h-3.5 w-3.5" />
+                  <span>View</span>
+                </Link>
+              </div>
+
+              <div className="text-xs bg-muted/40 rounded-lg p-2.5 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Mobile:</span>
+                  <a href={`tel:${customer.mobile}`} className="font-medium text-primary flex items-center gap-1 hover:underline">
+                    <Phone className="h-3 w-3" />
+                    {customer.mobile}
+                  </a>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Location:</span>
+                  <span className="font-medium text-foreground flex items-center gap-1">
+                    <MapPin className="h-3 w-3 text-muted-foreground" />
+                    {customer.location || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View (>= md) */}
+      <div className="hidden md:block rounded-md border bg-card shadow-sm">
         <div className="overflow-x-auto w-full">
           <Table>
             <TableHeader>

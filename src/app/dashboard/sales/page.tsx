@@ -43,7 +43,51 @@ export default async function SalesPage(props: { searchParams?: Promise<{ q?: st
         <SearchInput placeholder="Search sales by customer or vehicle..." />
       </div>
 
-      <div className="rounded-md border bg-card shadow-sm">
+      {/* Mobile Card List View (< md) */}
+      <div className="space-y-3 md:hidden">
+        {sales.length === 0 ? (
+          <div className="rounded-xl border bg-card p-8 text-center text-muted-foreground">
+            No sales found.
+          </div>
+        ) : (
+          sales.map((sale: any) => (
+            <div key={sale.id} className="rounded-xl border bg-card/80 backdrop-blur-md p-4 shadow-sm space-y-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="font-mono text-xs font-semibold text-primary">{sale.sale_number}</span>
+                  <p className="text-xs text-muted-foreground mt-0.5">{new Date(sale.created_at).toLocaleDateString()}</p>
+                </div>
+                <span className="text-base font-bold text-green-500">₹{sale.grand_total}</span>
+              </div>
+
+              <div className="text-xs bg-muted/40 rounded-lg p-2.5 space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Customer:</span>
+                  <span className="font-semibold text-foreground">{sale.customer_name || 'Walk-in'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Vehicle:</span>
+                  <span className="font-medium text-foreground">{sale.vehicle_number || 'None'}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-1 border-t border-border/40">
+                <Link href={`/dashboard/sales/${sale.id}`} className={buttonVariants({ variant: "outline", size: "sm", className: "h-8 px-3 text-xs gap-1.5" })}>
+                  <Eye className="h-3.5 w-3.5" />
+                  <span>View</span>
+                </Link>
+                <Link href={`/dashboard/sales/${sale.id}/invoice`} className={buttonVariants({ variant: "default", size: "sm", className: "h-8 px-3 text-xs gap-1.5" })}>
+                  <FileText className="h-3.5 w-3.5" />
+                  <span>Invoice</span>
+                </Link>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View (>= md) */}
+      <div className="hidden md:block rounded-md border bg-card shadow-sm">
         <div className="overflow-x-auto w-full">
           <Table>
             <TableHeader>

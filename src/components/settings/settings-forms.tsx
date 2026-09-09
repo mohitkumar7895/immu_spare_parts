@@ -13,7 +13,7 @@ import { AlertCircle } from 'lucide-react';
 function SubmitButton({ text }: { text: string }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" disabled={pending} className="w-full sm:w-auto">
       {pending ? 'Saving...' : text}
     </Button>
   );

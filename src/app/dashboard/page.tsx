@@ -63,27 +63,27 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-0.5">
           Welcome back, {session?.user?.name || 'User'}. Here's an overview of your store.
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Link key={index} href={stat.href} className="block transition-transform hover:scale-105">
+            <Link key={index} href={stat.href} className="block transition-transform hover:scale-[1.02] active:scale-95">
               <Card className={`h-full ${stat.alert ? 'border-red-200 bg-red-50/50 dark:border-red-900/50 dark:bg-red-900/10' : ''} hover:border-primary cursor-pointer`}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-xs sm:text-sm font-medium">
                     {stat.title}
                   </CardTitle>
                   <Icon className={`h-4 w-4 ${stat.alert ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground'}`} />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <p className={`text-xs ${stat.alert ? 'text-red-600 dark:text-red-400 font-medium' : 'text-muted-foreground'}`}>
+                  <div className="text-xl sm:text-2xl font-bold">{stat.value}</div>
+                  <p className={`text-xs ${stat.alert ? 'text-red-600 dark:text-red-400 font-medium' : 'text-muted-foreground'} mt-1`}>
                     {stat.description}
                   </p>
                 </CardContent>

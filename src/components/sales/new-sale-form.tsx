@@ -133,21 +133,21 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
               />
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 max-h-[300px] lg:max-h-[500px] overflow-y-auto pr-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 max-h-[350px] lg:max-h-[520px] overflow-y-auto pr-1 sm:pr-2">
               {filteredParts.slice(0, 12).map(part => (
-                <div key={part.id} className="border rounded-lg p-3 hover:border-primary cursor-pointer transition-colors" onClick={() => addToCart(part)}>
+                <div key={part.id} className="border rounded-xl p-3 hover:border-primary cursor-pointer transition-all active:scale-95 bg-card/60" onClick={() => addToCart(part)}>
                   <p className="font-semibold text-sm truncate" title={part.part_name}>{part.part_name}</p>
-                  <p className="text-xs text-muted-foreground">{part.part_number}</p>
+                  <p className="text-xs text-muted-foreground font-mono">{part.part_number}</p>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="font-bold">₹{part.selling_price}</span>
-                    <span className={`text-xs px-2 py-1 rounded ${part.current_stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    <span className="font-bold text-primary">₹{part.selling_price}</span>
+                    <span className={`text-[11px] px-2 py-0.5 rounded font-medium ${part.current_stock > 0 ? 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'}`}>
                       Stock: {part.current_stock}
                     </span>
                   </div>
                 </div>
               ))}
               {filteredParts.length === 0 && (
-                <div className="col-span-full py-8 text-center text-muted-foreground">
+                <div className="col-span-full py-8 text-center text-muted-foreground text-sm">
                   No parts found matching search.
                 </div>
               )}
@@ -159,63 +159,63 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
       {/* Right side: POS Cart & Checkout */}
       <div className="space-y-4">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center">
+          <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
+            <CardTitle className="text-base sm:text-lg flex items-center">
               <UserIcon className="w-5 h-5 mr-2" />
-              Customer
+              Customer Details
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 pt-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-muted-foreground">Mobile Number <span className="text-destructive">*</span></label>
+          <CardContent className="space-y-3.5 p-4 sm:p-6 pt-0 sm:pt-0">
+            <div className="space-y-1">
+              <label className="text-xs sm:text-sm font-medium text-muted-foreground">Mobile Number <span className="text-destructive">*</span></label>
               <div className="relative">
                 <Phone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input 
                   placeholder="e.g. 9876543210" 
                   value={customerMobile}
                   onChange={handleMobileChange}
-                  className="pl-9"
+                  className="pl-9 h-9 text-sm"
                   type="tel"
                 />
               </div>
               <p className="text-[10px] text-muted-foreground ml-1">Auto-fills details if customer exists</p>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-muted-foreground">Customer Name <span className="text-destructive">*</span></label>
+            <div className="space-y-1">
+              <label className="text-xs sm:text-sm font-medium text-muted-foreground">Customer Name <span className="text-destructive">*</span></label>
               <div className="relative">
                 <UserIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input 
                   placeholder="e.g. Rahul Kumar" 
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="pl-9"
+                  className="pl-9 h-9 text-sm"
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-muted-foreground">Location / Address</label>
+            <div className="space-y-1">
+              <label className="text-xs sm:text-sm font-medium text-muted-foreground">Location / Address</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input 
                   placeholder="e.g. Delhi, India" 
                   value={customerAddress}
                   onChange={(e) => setCustomerAddress(e.target.value)}
-                  className="pl-9"
+                  className="pl-9 h-9 text-sm"
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5 pt-3 border-t mt-1">
-              <label className="text-sm font-medium text-muted-foreground">Vehicle Number</label>
+            <div className="space-y-1 pt-2 border-t mt-1">
+              <label className="text-xs sm:text-sm font-medium text-muted-foreground">Vehicle Number</label>
               <div className="relative">
                 <Car className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input 
                   placeholder="e.g. DL 1C AB 1234 (Optional)" 
                   value={vehicleNumber}
                   onChange={(e) => setVehicleNumber(e.target.value)}
-                  className="pl-9 uppercase"
+                  className="pl-9 h-9 text-sm uppercase"
                 />
               </div>
             </div>
@@ -223,32 +223,32 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
         </Card>
 
         <Card className="flex flex-col flex-grow">
-          <CardHeader className="bg-muted/50 border-b pb-4">
-            <CardTitle className="text-lg">Current Sale</CardTitle>
+          <CardHeader className="bg-muted/50 border-b p-4 pb-3">
+            <CardTitle className="text-base sm:text-lg">Current Sale</CardTitle>
           </CardHeader>
-          <CardContent className="flex-grow pt-4">
+          <CardContent className="flex-grow p-4 pt-3">
             {cart.length === 0 ? (
-              <div className="text-center text-muted-foreground py-8">
+              <div className="text-center text-muted-foreground py-8 text-sm">
                 Cart is empty. Add parts to continue.
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {cart.map(item => (
-                  <div key={item.part_id} className="flex justify-between items-center border-b pb-3">
-                    <div className="flex-1">
-                      <p className="font-medium text-sm line-clamp-1">{item.part_name}</p>
-                      <p className="text-xs text-muted-foreground">₹{item.selling_price} x {item.quantity}</p>
+                  <div key={item.part_id} className="flex justify-between items-center border-b pb-2.5 gap-2">
+                    <div className="flex-1 min-w-0 pr-1">
+                      <p className="font-semibold text-xs sm:text-sm truncate">{item.part_name}</p>
+                      <p className="text-[11px] text-muted-foreground">₹{item.selling_price} × {item.quantity}</p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <Input 
                         type="number" 
                         min="1" 
                         max={item.max_stock}
                         value={item.quantity}
                         onChange={(e) => updateQuantity(item.part_id, parseInt(e.target.value) || 1)}
-                        className="w-16 h-8 text-center px-1"
+                        className="w-14 h-8 text-center px-1 text-xs sm:text-sm"
                       />
-                      <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.part_id)} className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50">
+                      <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.part_id)} className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 shrink-0">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -257,15 +257,15 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
               </div>
             )}
           </CardContent>
-          <div className="border-t p-4 bg-muted/50 space-y-3">
-            <div className="flex justify-between text-sm">
+          <div className="border-t p-4 bg-muted/50 space-y-2.5">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-medium">₹{subtotal.toFixed(2)}</span>
+              <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between items-center text-sm">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
               <span className="text-muted-foreground">Discount (%)</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] text-muted-foreground">
                   (-₹{discountAmount.toFixed(2)})
                 </span>
                 <Input 
@@ -274,13 +274,13 @@ export function NewSaleForm({ customers, parts }: { customers: any[], parts: any
                   max="100"
                   value={discountPercent || ''}
                   onChange={(e) => setDiscountPercent(parseFloat(e.target.value) || 0)}
-                  className="w-20 h-8 text-right"
+                  className="w-16 h-8 text-right text-xs sm:text-sm"
                 />
               </div>
             </div>
-            <div className="border-t pt-3 flex justify-between items-center text-lg font-bold">
+            <div className="border-t pt-2.5 flex justify-between items-center text-base sm:text-lg font-bold">
               <span>Total</span>
-              <span className="text-green-700">₹{grandTotal.toFixed(2)}</span>
+              <span className="text-green-600 dark:text-green-500">₹{grandTotal.toFixed(2)}</span>
             </div>
             <Button 
               className="w-full mt-4" 

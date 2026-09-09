@@ -17,7 +17,7 @@ export async function globalSearch(query: string) {
   
   // Search parts
   const [parts] = await pool.query<RowDataPacket[]>(
-    'SELECT * FROM parts WHERE part_number LIKE ? OR part_name LIKE ? OR vehicle_name LIKE ? OR company_name LIKE ? ORDER BY part_name ASC LIMIT 20',
+    'SELECT * FROM parts WHERE part_number LIKE ? OR part_name LIKE ? OR vehicle_name LIKE ? OR company_name LIKE ? ORDER BY part_name ASC, vehicle_name ASC LIMIT 20',
     [searchParam, searchParam, searchParam, searchParam]
   );
   

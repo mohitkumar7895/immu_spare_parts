@@ -164,11 +164,11 @@ export function AddCustomerForm() {
 
             </div>
 
-            <div className="flex justify-end gap-4 border-t pt-4">
-              <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending}>
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t pt-4">
+              <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending} className="w-full sm:w-auto">
                 Cancel
               </Button>
-              <Button type="submit" disabled={isPending}>
+              <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
                 {isPending ? 'Saving...' : 'Save Customer'}
               </Button>
             </div>

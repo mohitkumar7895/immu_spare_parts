@@ -7,6 +7,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { HiddenPrice } from '@/components/inventory/hidden-price';
+import { DeletePartButton } from '@/components/inventory/delete-part-button';
 
 export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -42,10 +43,18 @@ export default async function PartDetailsPage(props: { params: Promise<{ id: str
           </div>
         </div>
         {isAdmin && (
-          <Link href={`/dashboard/inventory/${part.id}/edit`} className={buttonVariants({ variant: "outline" })}>
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Part
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href={`/dashboard/inventory/${part.id}/edit`} className={buttonVariants({ variant: "outline" })}>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Part
+            </Link>
+            <DeletePartButton
+              partId={part.id}
+              partName={part.part_name}
+              variant="button"
+              redirectToInventory={true}
+            />
+          </div>
         )}
       </div>
 

@@ -9,6 +9,7 @@ import { updatePart } from '@/app/actions/inventory-actions';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { DeletePartButton } from '@/components/inventory/delete-part-button';
 import {
   Form,
   FormControl,
@@ -264,13 +265,21 @@ export function EditPartForm({ part }: { part: any }) {
               )}
             />
 
-            <div className="flex justify-end gap-4 border-t pt-4">
-              <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? 'Updating...' : 'Update Part'}
-              </Button>
+            <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-4 border-t pt-4">
+              <DeletePartButton
+                partId={part.id}
+                partName={part.part_name}
+                variant="button"
+                redirectToInventory={true}
+              />
+              <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
+                <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? 'Updating...' : 'Update Part'}
+                </Button>
+              </div>
             </div>
           </form>
         </Form>
