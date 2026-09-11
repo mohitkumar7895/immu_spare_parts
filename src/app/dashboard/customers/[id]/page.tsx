@@ -8,10 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const customer = await getCustomerById(params.id);
-  if (!customer) return { title: 'Not Found' };
-  return { title: `${customer.name} | Customers` };
+  try {
+    const params = await props.params;
+    const customer = await getCustomerById(params.id);
+    if (!customer) return { title: 'Customer Not Found | Customers' };
+    return { title: `${customer.name} | Customers` };
+  } catch {
+    return { title: 'Customer Details | Customers' };
+  }
 }
 
 export default async function CustomerDetailsPage(props: { params: Promise<{ id: string }> }) {

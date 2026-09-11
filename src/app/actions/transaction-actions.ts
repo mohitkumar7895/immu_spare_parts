@@ -141,7 +141,7 @@ export async function createSale(data: CreateSaleDTO) {
 
 export async function getSales(last24Hours: boolean = false, query: string = ''): Promise<Sale[]> {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) return [];
 
   let sqlQuery = `
     SELECT s.*, c.name as customer_name, v.vehicle_number 
@@ -165,37 +165,46 @@ export async function getSales(last24Hours: boolean = false, query: string = '')
   
   sqlQuery += ` ORDER BY s.created_at DESC`;
 
-  const [rows] = await pool.query<RowDataPacket[]>(sqlQuery, params);
-  
-  return rows as any; // Cast generic row to extended sale object for UI
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(sqlQuery, params);
+    return rows as any; // Cast generic row to extended sale object for UI
+  } catch (error) {
+    console.error('Failed to get sales:', error);
+    return [];
+  }
 }
 
 export async function getSaleById(id: string) {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) return null;
 
-  const [saleRows] = await pool.query<RowDataPacket[]>(`
-    SELECT s.*, c.name as customer_name, c.mobile as customer_mobile, c.address as customer_address, v.vehicle_number 
-    FROM sales s 
-    LEFT JOIN customers c ON s.customer_id = c.id
-    LEFT JOIN vehicles v ON s.vehicle_id = v.id
-    WHERE s.id = ?
-  `, [id]);
-  
-  if (saleRows.length === 0) return null;
-  const sale = saleRows[0] as any;
+  try {
+    const [saleRows] = await pool.query<RowDataPacket[]>(`
+      SELECT s.*, c.name as customer_name, c.mobile as customer_mobile, c.address as customer_address, v.vehicle_number 
+      FROM sales s 
+      LEFT JOIN customers c ON s.customer_id = c.id
+      LEFT JOIN vehicles v ON s.vehicle_id = v.id
+      WHERE s.id = ?
+    `, [id]);
+    
+    if (saleRows.length === 0) return null;
+    const sale = saleRows[0] as any;
 
-  const [itemRows] = await pool.query<RowDataPacket[]>(`
-    SELECT si.*, p.part_name, p.part_number 
-    FROM sale_items si 
-    JOIN parts p ON si.part_id = p.id
-    WHERE si.sale_id = ?
-  `, [id]);
-  
-  return {
-    ...sale,
-    items: itemRows as SaleItem[]
-  };
+    const [itemRows] = await pool.query<RowDataPacket[]>(`
+      SELECT si.*, p.part_name, p.part_number 
+      FROM sale_items si 
+      JOIN parts p ON si.part_id = p.id
+      WHERE si.sale_id = ?
+    `, [id]);
+    
+    return {
+      ...sale,
+      items: itemRows as SaleItem[]
+    };
+  } catch (error) {
+    console.error(`Failed to get sale ${id}:`, error);
+    return null;
+  }
 }
 
 export interface CreatePurchaseDTO {
@@ -282,7 +291,7 @@ export async function createPurchase(data: CreatePurchaseDTO) {
 
 export async function getPurchases(query: string = '') {
   const session = await auth();
-  if (session?.user?.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (session?.user?.role !== 'ADMIN') return [];
 
   let sqlQuery = `SELECT * FROM purchases WHERE 1=1`;
   const params: any[] = [];
@@ -295,31 +304,40 @@ export async function getPurchases(query: string = '') {
 
   sqlQuery += ` ORDER BY created_at DESC`;
 
-  const [rows] = await pool.query<RowDataPacket[]>(sqlQuery, params);
-  
-  return rows;
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(sqlQuery, params);
+    return rows;
+  } catch (error) {
+    console.error('Failed to get purchases:', error);
+    return [];
+  }
 }
 
 export async function getPurchaseById(id: string) {
   const session = await auth();
-  if (session?.user?.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (session?.user?.role !== 'ADMIN') return null;
 
-  const [purchaseRows] = await pool.query<RowDataPacket[]>(`
-    SELECT * FROM purchases WHERE id = ?
-  `, [id]);
-  
-  if (purchaseRows.length === 0) return null;
-  const purchase = purchaseRows[0] as any;
+  try {
+    const [purchaseRows] = await pool.query<RowDataPacket[]>(`
+      SELECT * FROM purchases WHERE id = ?
+    `, [id]);
+    
+    if (purchaseRows.length === 0) return null;
+    const purchase = purchaseRows[0] as any;
 
-  const [itemRows] = await pool.query<RowDataPacket[]>(`
-    SELECT pi.*, p.part_name, p.part_number 
-    FROM purchase_items pi 
-    JOIN parts p ON pi.part_id = p.id
-    WHERE pi.purchase_id = ?
-  `, [id]);
-  
-  return {
-    ...purchase,
-    items: itemRows
-  };
+    const [itemRows] = await pool.query<RowDataPacket[]>(`
+      SELECT pi.*, p.part_name, p.part_number 
+      FROM purchase_items pi 
+      JOIN parts p ON pi.part_id = p.id
+      WHERE pi.purchase_id = ?
+    `, [id]);
+    
+    return {
+      ...purchase,
+      items: itemRows
+    };
+  } catch (error) {
+    console.error(`Failed to get purchase ${id}:`, error);
+    return null;
+  }
 }

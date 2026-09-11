@@ -12,7 +12,7 @@ const generateId = (prefix: string) => `${prefix}_${crypto.randomBytes(8).toStri
 
 export async function getCustomers(searchQuery?: string): Promise<Customer[]> {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) return [];
 
   let query = 'SELECT * FROM customers ORDER BY created_at DESC';
   let params: any[] = [];
@@ -29,18 +29,27 @@ export async function getCustomers(searchQuery?: string): Promise<Customer[]> {
     params = [searchParam, searchParam, searchParam];
   }
 
-  const [rows] = await pool.query<RowDataPacket[]>(query, params);
-  return rows as Customer[];
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(query, params);
+    return rows as Customer[];
+  } catch (error) {
+    console.error('Failed to get customers:', error);
+    return [];
+  }
 }
 
 export async function getCustomerById(id: string): Promise<Customer | null> {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) return null;
 
-  const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM customers WHERE id = ?', [id]);
-  if (rows.length === 0) return null;
-
-  return rows[0] as Customer;
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM customers WHERE id = ?', [id]);
+    if (rows.length === 0) return null;
+    return rows[0] as Customer;
+  } catch (error) {
+    console.error(`Failed to get customer ${id}:`, error);
+    return null;
+  }
 }
 
 export async function addCustomer(data: CreateCustomerDTO) {
@@ -110,24 +119,29 @@ export async function updateCustomer(id: string, data: UpdateCustomerDTO) {
 
 export async function getCustomerVehicles(customerId: string) {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) return [];
 
-  const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM vehicles WHERE customer_id = ? ORDER BY created_at DESC', [customerId]);
-  return rows as any[];
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM vehicles WHERE customer_id = ? ORDER BY created_at DESC', [customerId]);
+    return rows as any[];
+  } catch (error) {
+    console.error(`Failed to get vehicles for customer ${customerId}:`, error);
+    return [];
+  }
 }
 
 export async function getCustomerSalesHistory(customerId: string) {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) return [];
 
   const query = `
     SELECT 
       s.id, 
       s.sale_date, 
-      s.grand_total,
+      s.grand_total, 
       s.sale_number,
       si.selling_price, 
-      si.quantity,
+      si.quantity, 
       si.total as item_total,
       p.part_name, 
       p.part_number, 
@@ -141,6 +155,11 @@ export async function getCustomerSalesHistory(customerId: string) {
     ORDER BY s.sale_date DESC
   `;
   
-  const [rows] = await pool.query<RowDataPacket[]>(query, [customerId]);
-  return rows as any[];
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(query, [customerId]);
+    return rows as any[];
+  } catch (error) {
+    console.error(`Failed to get sales history for customer ${customerId}:`, error);
+    return [];
+  }
 }
