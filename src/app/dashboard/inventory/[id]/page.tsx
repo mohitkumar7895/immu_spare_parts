@@ -10,10 +10,14 @@ import { HiddenPrice } from '@/components/inventory/hidden-price';
 import { DeletePartButton } from '@/components/inventory/delete-part-button';
 
 export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const part = await getPartById(params.id);
-  if (!part) return { title: 'Not Found' };
-  return { title: `${part.part_name} | Inventory` };
+  try {
+    const params = await props.params;
+    const part = await getPartById(params.id);
+    if (!part) return { title: 'Part Not Found | Inventory' };
+    return { title: `${part.part_name} | Inventory` };
+  } catch {
+    return { title: 'Part Details | Inventory' };
+  }
 }
 
 export default async function PartDetailsPage(props: { params: Promise<{ id: string }> }) {

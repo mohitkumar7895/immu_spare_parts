@@ -7,13 +7,17 @@ import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 
 export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const vehicle = await getVehicleById(params.id);
-  if (!vehicle) return { title: 'Vehicle Not Found' };
-  
-  return {
-    title: `${vehicle.vehicle_number} | Edit Vehicle`,
-  };
+  try {
+    const params = await props.params;
+    const vehicle = await getVehicleById(params.id);
+    if (!vehicle) return { title: 'Vehicle Not Found | Vehicles' };
+    
+    return {
+      title: `${vehicle.vehicle_number} | Vehicle Details`,
+    };
+  } catch {
+    return { title: 'Vehicle Details | Vehicles' };
+  }
 }
 
 export default async function EditVehiclePage(props: { params: Promise<{ id: string }> }) {

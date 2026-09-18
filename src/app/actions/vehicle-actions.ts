@@ -12,7 +12,7 @@ const generateId = (prefix: string) => `${prefix}_${crypto.randomBytes(8).toStri
 
 export async function getVehicles(searchQuery?: string): Promise<VehicleWithCustomer[]> {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) return [];
 
   let query = `
     SELECT v.*, c.name as customer_name, c.mobile as customer_mobile
@@ -36,24 +36,34 @@ export async function getVehicles(searchQuery?: string): Promise<VehicleWithCust
     params = [searchParam, searchParam, searchParam];
   }
 
-  const [rows] = await pool.query<RowDataPacket[]>(query, params);
-  return rows as VehicleWithCustomer[];
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(query, params);
+    return rows as VehicleWithCustomer[];
+  } catch (error) {
+    console.error('Failed to get vehicles:', error);
+    return [];
+  }
 }
 
 export async function getVehicleById(id: string): Promise<VehicleWithCustomer | null> {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) return null;
 
-  const [rows] = await pool.query<RowDataPacket[]>(`
-    SELECT v.*, c.name as customer_name, c.mobile as customer_mobile
-    FROM vehicles v
-    LEFT JOIN customers c ON v.customer_id = c.id
-    WHERE v.id = ?
-  `, [id]);
-  
-  if (rows.length === 0) return null;
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(`
+      SELECT v.*, c.name as customer_name, c.mobile as customer_mobile
+      FROM vehicles v
+      LEFT JOIN customers c ON v.customer_id = c.id
+      WHERE v.id = ?
+    `, [id]);
+    
+    if (rows.length === 0) return null;
 
-  return rows[0] as VehicleWithCustomer;
+    return rows[0] as VehicleWithCustomer;
+  } catch (error) {
+    console.error(`Failed to get vehicle ${id}:`, error);
+    return null;
+  }
 }
 
 export async function addVehicle(data: CreateVehicleDTO) {

@@ -30,7 +30,7 @@ async function ensureMechanicColumn() {
 
 export async function getParts(searchQuery?: string): Promise<Part[]> {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) return [];
 
   await ensureMechanicColumn();
 
@@ -59,37 +59,47 @@ export async function getParts(searchQuery?: string): Promise<Part[]> {
     params = [searchParam, searchParam, searchParam, searchParam];
   }
 
-  const [rows] = await pool.query<RowDataPacket[]>(query, params);
-  
-  // Expose purchase_price and mechanic_price only to ADMIN
-  const isAdmin = session.user.role === 'ADMIN';
-  
-  return rows.map((row) => {
-    const part = row as Part;
-    if (!isAdmin) {
-      part.purchase_price = 0; 
-      part.mechanic_price = 0;
-    }
-    return part;
-  });
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>(query, params);
+    
+    // Expose purchase_price and mechanic_price only to ADMIN
+    const isAdmin = session.user.role === 'ADMIN';
+    
+    return rows.map((row) => {
+      const part = row as Part;
+      if (!isAdmin) {
+        part.purchase_price = 0; 
+        part.mechanic_price = 0;
+      }
+      return part;
+    });
+  } catch (error) {
+    console.error('Failed to get parts:', error);
+    return [];
+  }
 }
 
 export async function getPartById(id: string): Promise<Part | null> {
   const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) return null;
 
-  const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM parts WHERE id = ?', [id]);
-  
-  if (rows.length === 0) return null;
+  try {
+    const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM parts WHERE id = ?', [id]);
+    
+    if (rows.length === 0) return null;
 
-  const part = rows[0] as Part;
-  
-  if (session.user.role !== 'ADMIN') {
-    part.purchase_price = 0;
-    part.mechanic_price = 0;
+    const part = rows[0] as Part;
+    
+    if (session.user.role !== 'ADMIN') {
+      part.purchase_price = 0;
+      part.mechanic_price = 0;
+    }
+    
+    return part;
+  } catch (error) {
+    console.error(`Failed to get part ${id}:`, error);
+    return null;
   }
-  
-  return part;
 }
 
 export async function addPart(data: CreatePartDTO) {
