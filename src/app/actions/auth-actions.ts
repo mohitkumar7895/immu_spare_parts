@@ -1,7 +1,8 @@
 'use server';
 
-import { auth, signIn } from '@/lib/auth';
+import { auth, signIn, signOut } from '@/lib/auth';
 import { AuthError } from 'next-auth';
+import { redirect } from 'next/navigation';
 import pool from '@/lib/db';
 import { z } from 'zod';
 
@@ -17,7 +18,7 @@ export async function loginAction(prevState: any, formData: FormData) {
     await signIn('credentials', {
       username: formData.get('username'),
       password: formData.get('password'),
-      redirectTo: '/dashboard',
+      redirect: false,
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -28,8 +29,14 @@ export async function loginAction(prevState: any, formData: FormData) {
           return { success: false, message: 'Something went wrong.' };
       }
     }
-    throw error; // This is necessary for Next.js redirects to work!
+    throw error;
   }
+
+  redirect('/dashboard');
+}
+
+export async function logoutAction() {
+  await signOut({ redirectTo: '/login' });
 }
 
 export async function registerAction(prevState: any, formData: FormData) {

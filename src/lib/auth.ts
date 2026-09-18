@@ -6,8 +6,6 @@ import { authConfig } from './auth.config';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
-  trustHost: true,
-  useSecureCookies: process.env.NODE_ENV === 'production',
   providers: [
     Credentials({
       name: 'Credentials',
@@ -35,15 +33,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!isMatch) return null;
 
         return {
-          id: user.id,
+          id: String(user.id),
           name: user.name,
           role: user.role,
         };
       },
     }),
   ],
-  session: {
-    strategy: 'jwt',
-  },
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
 });

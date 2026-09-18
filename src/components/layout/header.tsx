@@ -16,8 +16,8 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from 
 import { navItems } from './sidebar';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { signOut } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
+import { logoutAction } from '@/app/actions/auth-actions';
 import { useState } from 'react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
@@ -136,7 +136,7 @@ export function Header({ user, companyLogo }: { user: any, companyLogo?: string 
                   variant="destructive" 
                   size="sm" 
                   className="flex-1 text-xs h-8"
-                  onClick={() => signOut({ callbackUrl: '/login' })}
+                  onClick={() => logoutAction()}
                 >
                   <LogOut className="mr-1.5 h-3.5 w-3.5" />
                   Log out
@@ -186,7 +186,7 @@ export function Header({ user, companyLogo }: { user: any, companyLogo?: string 
               <UserIcon className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/login' })}>
+            <DropdownMenuItem onClick={() => logoutAction()}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>

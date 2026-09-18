@@ -1,31 +1,37 @@
 'use client';
 
-import { useActionState } from 'react';
-import { loginAction } from '@/app/actions/auth-actions';
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Wrench, ArrowRight, Lock, User } from 'lucide-react';
-import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  
-  return (
-    <Button 
-      type="submit" 
-      className="w-full bg-white text-black hover:bg-gray-200 transition-all duration-300 group rounded-xl h-12 text-base font-semibold"
-      disabled={pending}
-    >
-      {pending ? 'Authenticating...' : 'Sign In'}
-      {!pending && <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
-    </Button>
-  );
-}
-
 export function LoginForm() {
-  const [state, formAction] = useActionState(loginAction, undefined);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+
+    const formData = new FormData(event.currentTarget);
+    const result = await signIn('credentials', {
+      username: String(formData.get('username') || ''),
+      password: String(formData.get('password') || ''),
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setError('Invalid username or password.');
+      setPending(false);
+      return;
+    }
+
+    window.location.assign('/dashboard');
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-950">
@@ -47,7 +53,7 @@ export function LoginForm() {
         </div>
 
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
-          <form action={formAction} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="username" className="text-slate-200 ml-1">Username</Label>
               <div className="relative">
@@ -81,13 +87,20 @@ export function LoginForm() {
               </div>
             </div>
             
-            {state?.success === false && (
+            {error && (
               <div className="text-sm text-red-200 bg-red-500/20 border border-red-500/50 p-4 rounded-xl animate-in fade-in slide-in-from-top-2">
-                {state.message}
+                {error}
               </div>
             )}
 
-            <SubmitButton />
+            <Button
+              type="submit"
+              className="w-full bg-white text-black hover:bg-gray-200 transition-all duration-300 group rounded-xl h-12 text-base font-semibold"
+              disabled={pending}
+            >
+              {pending ? 'Authenticating...' : 'Sign In'}
+              {!pending && <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+            </Button>
           </form>
           
           <div className="mt-8 flex flex-col space-y-3 text-center text-sm text-slate-400">
