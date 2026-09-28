@@ -1,5 +1,4 @@
 import { getCustomers } from '@/app/actions/customer-actions';
-import { auth } from '@/lib/auth';
 import Link from 'next/link';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Plus, Search, Eye, Phone, MapPin } from 'lucide-react';
@@ -17,7 +16,6 @@ export default async function CustomersPage(props: {
   searchParams: Promise<{ q?: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const session = await auth();
   const customers = await getCustomers(searchParams.q);
 
   return (

@@ -1,5 +1,4 @@
 import { getVehicles } from '@/app/actions/vehicle-actions';
-import { auth } from '@/lib/auth';
 import Link from 'next/link';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Plus, Search, Eye, Car, Phone } from 'lucide-react';
@@ -18,7 +17,6 @@ export default async function VehiclesPage(props: {
   searchParams: Promise<{ q?: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const session = await auth();
   const vehicles = await getVehicles(searchParams.q);
 
   return (

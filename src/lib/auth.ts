@@ -3,8 +3,9 @@ import Credentials from 'next-auth/providers/credentials';
 import pool from './db';
 import { RowDataPacket } from 'mysql2';
 import { authConfig } from './auth.config';
+import { cache } from 'react';
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+const nextAuth = NextAuth({
   ...authConfig,
   trustHost: true,
   useSecureCookies: process.env.NODE_ENV === 'production',
@@ -20,9 +21,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const [rows] = await pool.query<RowDataPacket[]>(
-          'SELECT * FROM users WHERE username = ?',
-          [credentials.username]
+        const [rows] = await pool.execute<RowDataPacket[]>(
+          'SELECT id, name, role, password FROM users WHERE username = ? LIMIT 1',
+          [String(credentials.username)]
         );
 
         const user = rows[0];
@@ -47,3 +48,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
 });
+
+export const { handlers, signIn, signOut } = nextAuth;
+export const auth = cache(nextAuth.auth);

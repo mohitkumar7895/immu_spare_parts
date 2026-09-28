@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { 
   LayoutDashboard, 
@@ -27,13 +27,14 @@ export const navItems = [
 
 export function Sidebar({ user, companyLogo }: { user: any, companyLogo?: string | null }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const filteredItems = navItems.filter(
     (item: any) => !item.requireAdmin || user?.role === 'ADMIN'
   );
 
   return (
-    <aside className="w-64 bg-background/30 backdrop-blur-2xl border-r border-white/10 h-screen flex flex-col fixed inset-y-0 left-0 z-20 hidden md:flex shadow-[4px_0_24px_-10px_rgba(0,0,0,0.5)]">
+    <aside className="w-64 bg-background/95 border-r border-white/10 h-screen flex flex-col fixed inset-y-0 left-0 z-20 hidden md:flex shadow-[4px_0_24px_-10px_rgba(0,0,0,0.5)]">
       <div className="h-16 flex items-center px-6 border-b border-white/10">
         {companyLogo ? (
           <div className="h-8 max-w-[140px] mr-3 flex items-center justify-start">
@@ -60,9 +61,11 @@ export function Sidebar({ user, companyLogo }: { user: any, companyLogo?: string
               <Link
                 key={item.name}
                 href={item.href}
-                prefetch={true}
+                prefetch={false}
+                onPointerEnter={() => router.prefetch(item.href)}
+                onFocus={() => router.prefetch(item.href)}
                 className={cn(
-                  "flex items-center px-3 py-2.5 text-sm font-medium rounded-xl group transition-all duration-300",
+                  "flex items-center px-3 py-2.5 text-sm font-medium rounded-xl group transition-colors duration-150",
                   isActive 
                     ? "bg-gradient-to-r from-primary/20 to-blue-600/10 text-primary border border-primary/20 shadow-sm" 
                     : "text-muted-foreground hover:bg-white/5 hover:text-foreground border border-transparent"
@@ -70,7 +73,7 @@ export function Sidebar({ user, companyLogo }: { user: any, companyLogo?: string
               >
                 <Icon 
                   className={cn(
-                    "mr-3 flex-shrink-0 h-5 w-5 transition-transform duration-300 group-hover:scale-110",
+                    "mr-3 flex-shrink-0 h-5 w-5 transition-transform duration-150 group-hover:scale-105",
                     isActive ? "text-primary drop-shadow-[0_0_8px_rgba(112,22,235,0.5)]" : "text-muted-foreground group-hover:text-foreground"
                   )} 
                 />

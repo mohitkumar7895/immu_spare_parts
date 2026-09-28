@@ -29,13 +29,9 @@ export function LoginForm() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-950">
-      {/* Background glowing orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-blue-600/30 blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 rounded-full bg-purple-600/30 blur-[100px] pointer-events-none" />
-      
       <div className="relative z-10 w-full max-w-md p-6 sm:p-10">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/20 mb-6 shadow-2xl">
+          <div className="bg-white/10 p-4 rounded-2xl border border-white/20 mb-6 shadow-xl">
             <Wrench className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-white mb-2 font-sans">
@@ -46,7 +42,7 @@ export function LoginForm() {
           </p>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-slate-900/95 border border-white/20 rounded-3xl p-8 shadow-xl">
           <form action={formAction} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="username" className="text-slate-200 ml-1">Username</Label>

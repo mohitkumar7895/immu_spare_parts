@@ -15,11 +15,24 @@ export async function globalSearch(query: string) {
   
   const searchParam = `%${query}%`;
   
-  // Search parts
-  const [parts] = await pool.query<RowDataPacket[]>(
-    'SELECT * FROM parts WHERE part_number LIKE ? OR part_name LIKE ? OR vehicle_name LIKE ? OR company_name LIKE ? ORDER BY part_name ASC, vehicle_name ASC LIMIT 20',
-    [searchParam, searchParam, searchParam, searchParam]
-  );
+  const [partsResult, customersResult, salesResult] = await Promise.all([
+    pool.query<RowDataPacket[]>(
+      'SELECT * FROM parts WHERE part_number LIKE ? OR part_name LIKE ? OR vehicle_name LIKE ? OR company_name LIKE ? ORDER BY part_name ASC, vehicle_name ASC LIMIT 20',
+      [searchParam, searchParam, searchParam, searchParam]
+    ),
+    pool.query<RowDataPacket[]>(
+      'SELECT * FROM customers WHERE name LIKE ? OR mobile LIKE ? OR location LIKE ? ORDER BY name ASC LIMIT 10',
+      [searchParam, searchParam, searchParam]
+    ),
+    pool.query<RowDataPacket[]>(
+      'SELECT s.*, c.name as customer_name FROM sales s LEFT JOIN customers c ON s.customer_id = c.id WHERE s.sale_number LIKE ? OR c.name LIKE ? ORDER BY s.created_at DESC LIMIT 10',
+      [searchParam, searchParam]
+    ),
+  ]);
+
+  const parts = partsResult[0];
+  const customers = customersResult[0];
+  const sales = salesResult[0];
   
   if (!isAdmin) {
     parts.forEach(p => {
@@ -27,17 +40,5 @@ export async function globalSearch(query: string) {
     });
   }
   
-  // Search customers
-  const [customers] = await pool.query<RowDataPacket[]>(
-    'SELECT * FROM customers WHERE name LIKE ? OR mobile LIKE ? OR location LIKE ? ORDER BY name ASC LIMIT 10',
-    [searchParam, searchParam, searchParam]
-  );
-  
-  // Search sales
-  const [sales] = await pool.query<RowDataPacket[]>(
-    'SELECT s.*, c.name as customer_name FROM sales s LEFT JOIN customers c ON s.customer_id = c.id WHERE s.sale_number LIKE ? OR c.name LIKE ? ORDER BY s.created_at DESC LIMIT 10',
-    [searchParam, searchParam]
-  );
-
   return { parts, customers, sales };
 }

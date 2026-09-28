@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(255) UNIQUE,
   reset_otp VARCHAR(10),
   reset_otp_expiry DATETIME,
+  avatar LONGTEXT,
   role ENUM('ADMIN', 'STAFF') DEFAULT 'STAFF',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS parts (
   company_name VARCHAR(255) NOT NULL,
   purchase_price DECIMAL(10, 2) NOT NULL,
   selling_price DECIMAL(10, 2) NOT NULL,
+  mechanic_price DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
   secret_cost DECIMAL(10, 2) NOT NULL,
   opening_stock INT DEFAULT 0,
   current_stock INT DEFAULT 0,
@@ -130,15 +132,35 @@ CREATE TABLE IF NOT EXISTS stock_movements (
   FOREIGN KEY (part_id) REFERENCES parts(id),
   FOREIGN KEY (created_by_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS app_settings (
+  setting_key VARCHAR(100) PRIMARY KEY,
+  setting_value LONGTEXT,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 `;
 
 async function main() {
-  if (!process.env.DATABASE_URL) {
-    console.error('DATABASE_URL is missing in .env');
+  const hasConnectionUrl = Boolean(process.env.DATABASE_URL);
+  const hasConnectionFields = Boolean(
+    process.env.DB_HOST && process.env.DB_USER && process.env.DB_NAME
+  );
+
+  if (!hasConnectionUrl && !hasConnectionFields) {
+    console.error('Database connection settings are missing in .env');
     process.exit(1);
   }
 
-  const connection = await mysql.createConnection(process.env.DATABASE_URL);
+  const connection = process.env.DATABASE_URL
+    ? await mysql.createConnection(process.env.DATABASE_URL)
+    : await mysql.createConnection({
+        host: process.env.DB_HOST!,
+        user: process.env.DB_USER!,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME!,
+        port: parseInt(process.env.DB_PORT || '3306', 10),
+        connectTimeout: 10000,
+      });
   console.log('Connected to database. Running migrations...');
   
   const statements = schema.split(';').map(s => s.trim()).filter(s => s.length > 0);
@@ -148,6 +170,23 @@ async function main() {
       console.log(`Executing: ${stmt.substring(0, 50)}...`);
       await connection.query(stmt);
     }
+
+    const [avatarColumns] = await connection.query<mysql.RowDataPacket[]>(
+      `SHOW COLUMNS FROM users LIKE 'avatar'`
+    );
+    if (avatarColumns.length === 0) {
+      await connection.query(`ALTER TABLE users ADD COLUMN avatar LONGTEXT`);
+    }
+
+    const [mechanicColumns] = await connection.query<mysql.RowDataPacket[]>(
+      `SHOW COLUMNS FROM parts LIKE 'mechanic_price'`
+    );
+    if (mechanicColumns.length === 0) {
+      await connection.query(
+        `ALTER TABLE parts ADD COLUMN mechanic_price DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER selling_price`
+      );
+    }
+
     console.log('Migrations completed successfully.');
   } catch (error) {
     console.error('Migration failed:', error);

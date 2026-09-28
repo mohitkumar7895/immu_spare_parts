@@ -41,14 +41,14 @@ export function Header({ user, companyLogo }: { user: any, companyLogo?: string 
   };
 
   return (
-    <header className="h-16 bg-background/30 backdrop-blur-2xl border-b border-white/10 flex items-center justify-between px-3 sm:px-6 lg:px-8 sticky top-0 z-20 w-full shadow-sm">
+    <header className="h-16 bg-background/95 border-b border-white/10 flex items-center justify-between px-3 sm:px-6 lg:px-8 sticky top-0 z-20 w-full shadow-sm">
       <div className="flex items-center flex-1 min-w-0">
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
           <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden mr-1.5 sm:mr-2 shrink-0 h-9 w-9" />}>
             <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle Menu</span>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 border-r border-white/10 flex flex-col bg-background/95 backdrop-blur-xl">
+          <SheetContent side="left" className="w-64 p-0 border-r border-white/10 flex flex-col bg-background">
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <SheetDescription className="sr-only">Sidebar navigation</SheetDescription>
             
@@ -78,10 +78,11 @@ export function Header({ user, companyLogo }: { user: any, companyLogo?: string 
                     <Link
                       key={item.name}
                       href={item.href}
-                      prefetch={true}
+                      prefetch={false}
+                      onPointerDown={() => router.prefetch(item.href)}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={cn(
-                        "flex items-center px-3.5 py-2.5 text-sm font-medium rounded-xl group transition-all",
+                        "flex items-center px-3.5 py-2.5 text-sm font-medium rounded-xl group transition-colors duration-150",
                         isActive 
                           ? "bg-gradient-to-r from-primary/20 to-blue-600/10 text-primary border border-primary/20 shadow-sm" 
                           : "text-muted-foreground hover:bg-white/5 hover:text-foreground border border-transparent"

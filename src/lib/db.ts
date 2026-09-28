@@ -15,11 +15,11 @@ const pool =
     port: parseInt(process.env.DB_PORT || '3306', 10),
     waitForConnections: true,
     connectionLimit: 10,
-    maxIdle: 5,
-    idleTimeout: 30000,
+    maxIdle: 10,
+    idleTimeout: 600000,
     enableKeepAlive: true,
-    keepAliveInitialDelay: 10000,
-    connectTimeout: 20000,
+    keepAliveInitialDelay: 0,
+    connectTimeout: 10000,
     namedPlaceholders: true, // Allows using named placeholders like :id
   });
 

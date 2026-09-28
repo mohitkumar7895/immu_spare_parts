@@ -1,5 +1,4 @@
 import { getSales } from '@/app/actions/transaction-actions';
-import { auth } from '@/lib/auth';
 import Link from 'next/link';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Plus, Search, Eye, FileText } from 'lucide-react';
@@ -18,7 +17,6 @@ import {
 export default async function SalesPage(props: { searchParams?: Promise<{ q?: string }> }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.q || '';
-  const session = await auth();
   const sales = await getSales(true, query);
 
   return (
