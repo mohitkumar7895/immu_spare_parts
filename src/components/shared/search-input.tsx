@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useTransition, useState, useEffect } from 'react';
+import { useTransition, useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search, Loader2 } from 'lucide-react';
 
@@ -13,16 +13,21 @@ export function SearchInput({ placeholder = "Search..." }: { placeholder?: strin
 
   const currentQuery = searchParams.get('q') || '';
   const [value, setValue] = useState(currentQuery);
+  const lastPushedQuery = useRef(currentQuery);
 
-  // Sync external changes to query param
+  // Sync external changes to query param (e.g. back button)
   useEffect(() => {
-    setValue(currentQuery);
+    if (currentQuery !== lastPushedQuery.current) {
+      setValue(currentQuery);
+      lastPushedQuery.current = currentQuery;
+    }
   }, [currentQuery]);
 
   useEffect(() => {
-    if (value.trim() === currentQuery.trim()) return;
+    if (value === lastPushedQuery.current) return;
 
     const timer = setTimeout(() => {
+      lastPushedQuery.current = value;
       const params = new URLSearchParams(searchParams.toString());
       if (value.trim()) {
         params.set('q', value.trim());
@@ -33,10 +38,10 @@ export function SearchInput({ placeholder = "Search..." }: { placeholder?: strin
       startTransition(() => {
         router.replace(`${pathname}?${params.toString()}`);
       });
-    }, 250);
+    }, 300);
 
     return () => clearTimeout(timer);
-  }, [value, currentQuery, pathname, router, searchParams]);
+  }, [value, pathname, router, searchParams]);
 
   return (
     <div className="relative flex-1">
