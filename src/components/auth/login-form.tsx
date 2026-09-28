@@ -48,13 +48,8 @@ export function LoginForm() {
           </p>
         </div>
 
-<<<<<<< HEAD
         <div className="bg-slate-900/95 border border-white/20 rounded-3xl p-8 shadow-xl">
-          <form action={formAction} className="space-y-6">
-=======
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
->>>>>>> 74ca2257755068cea99a270a7a62db229137cf26
             <div className="space-y-2">
               <Label htmlFor="username" className="text-slate-200 ml-1">Username</Label>
               <div className="relative">
